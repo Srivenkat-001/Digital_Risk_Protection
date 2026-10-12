@@ -6,6 +6,7 @@ BrandPhantom is a Streamlit demonstration of a digital-risk-protection workflow 
 
 - Tenant-scoped brand profiles, official social/app assets, aliases, and approved domains.
 - Database-backed dashboard, scan history, findings triage, investigations, and CSV reports.
+- A tenant-scoped project help assistant that searches saved candidate, finding, signal, assessment, evidence, and raw connector metadata records without transmitting them to an external AI service.
 - Deterministic fuzzy name/handle/text analysis, suspicious-affix and scam-language indicators, package/publisher checks, and perceptual-hash comparison.
 - Signal-level explanations and evidence limitations; missing data is not treated as malicious evidence.
 - SQLite by default, SQLAlchemy persistence, and Alembic configuration.
@@ -17,6 +18,8 @@ BrandPhantom is a Streamlit demonstration of a digital-risk-protection workflow 
 - In local demo mode, use the Admin, Analyst, or Viewer role-selection button on the sign-in screen. These passwordless shortcuts are disabled in production; seeded demo accounts receive random undisclosed password hashes.
 - Opt-in live sources: Bluesky public profile search uses the [public AppView API](https://docs.bsky.app/docs/api/app-bsky-actor-search-actors), and Apple App Store search uses Apple's [iTunes Search API](https://performance-partners.apple.com/search-api). Both are disabled by default and can be enabled with `LIVE_CONNECTORS_ENABLED=true`. Requests have timeouts, bounded response sizes, limited retries, and result caps. These public searches can be incomplete and do not provide real-time or private-account access.
 - **Live social-account search:** open **Social Monitoring**, select a brand, and click **Search live Bluesky profiles**. This runs the public Bluesky profile search without demo connectors, persists returned public profiles, and sends them through the detection and triage pipeline. It does not log in to accounts or search private data. The search is limited to Bluesky and may return incomplete results.
+- The seeded demo tenant includes Instagram and Snapchat reference brand profiles with official domains and descriptive aliases. No social handles are pre-marked verified; analysts must add and verify assets from authoritative evidence.
+- **AI Help & Raw Data** is a local keyword-grounded project/database search, not Meta AI or a generative language model. It can display raw stored metadata and finding evidence inside the authenticated tenant/brand scope. An external generative AI integration would require a separately configured provider and explicit privacy review.
 - The other social platforms currently show labeled synthetic demonstration examples only. Those examples use reserved `example.com` URLs so they cannot be mistaken for real profiles.
 - Twitter/X, Instagram, and Google Play remain unavailable adapter placeholders; their credentials do not enable collection. No external threat-intelligence or takedown access is claimed.
 - Detection is deterministic heuristic/fuzzy matching, not a trained AI/ML model. A similarity match or score is an indicator, not proof of fraud. Analyst verification is required.

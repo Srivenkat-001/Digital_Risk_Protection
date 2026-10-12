@@ -124,7 +124,17 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     with f_col1:
         platform_filter = st.selectbox(
             "Platform Filter",
-            ["All Platforms", "Bluesky", "Twitter/X", "Instagram", "Facebook", "TikTok", "LinkedIn", "Telegram"],
+            [
+                "All Platforms",
+                "Bluesky",
+                "Twitter/X",
+                "Instagram",
+                "Facebook",
+                "TikTok",
+                "LinkedIn",
+                "Telegram",
+                "Snapchat",
+            ],
         )
     with f_col2:
         view_mode = st.radio(

@@ -9,7 +9,7 @@ from config.logging_config import logger
 from config.settings import settings
 from db.models.organization import Organization
 from db.session import get_db, init_db
-from seed.demo_data import seed_demo_environment
+from seed.demo_data import ensure_platform_reference_brands, seed_demo_environment
 from ui.navigation import dispatch_page, render_login_view
 from ui.theme import apply_theme
 
@@ -33,6 +33,10 @@ with get_db() as db:
     if org_count == 0 and settings.DEMO_MODE_ENABLED:
         logger.info("Empty database detected. Auto-seeding initial NovaPay demo environment...")
         seed_demo_environment(db)
+    elif settings.DEMO_MODE_ENABLED:
+        demo_org = db.query(Organization).filter_by(slug="novapay-org").first()
+        if demo_org:
+            ensure_platform_reference_brands(db, demo_org.id)
 
 # Session state initialization
 if "user" not in st.session_state:

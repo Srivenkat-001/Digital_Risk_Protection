@@ -34,6 +34,7 @@ def seed_demo_environment(db: Session) -> tuple[Organization, Brand, User]:
 
     # 1. Seed Organization & Users
     org, admin_user = auth_service.seed_default_users_and_org()
+    ensure_platform_reference_brands(db, org.id, admin_user.id)
 
     # 2. Check if NovaPay brand already exists
     brand = brand_service.repo.get_by_name("NovaPay", org.id)
@@ -118,3 +119,49 @@ def seed_demo_environment(db: Session) -> tuple[Organization, Brand, User]:
 
     logger.info("Demo environment initialization completed successfully.")
     return org, brand, admin_user
+
+
+def ensure_platform_reference_brands(
+    db: Session,
+    organization_id: str,
+    user_id: str | None = None,
+) -> None:
+    """Add idempotent platform reference brands without claiming verified accounts."""
+    brand_service = BrandService(db)
+    platform_brands = (
+        {
+            "name": "Instagram",
+            "display_name": "Instagram",
+            "legal_name": "Instagram, LLC",
+            "official_website": "https://www.instagram.com",
+            "industry": "Social Media",
+            "description": (
+                "Demo reference profile for monitoring impersonation targeting Instagram. "
+                "Platform-owned account assets have not been independently verified in this tenant."
+            ),
+            "aliases": ["IG", "Instagram"],
+            "approved_domains": ["instagram.com"],
+        },
+        {
+            "name": "Snapchat",
+            "display_name": "Snapchat",
+            "legal_name": "Snap Inc.",
+            "official_website": "https://www.snapchat.com",
+            "industry": "Social Media",
+            "description": (
+                "Demo reference profile for monitoring impersonation targeting Snapchat. "
+                "Platform-owned account assets have not been independently verified in this tenant."
+            ),
+            "aliases": ["Snap", "Snapchat"],
+            "approved_domains": ["snapchat.com"],
+        },
+    )
+
+    for profile in platform_brands:
+        if brand_service.repo.get_by_name(profile["name"], organization_id):
+            continue
+        brand_service.create_brand(
+            organization_id,
+            BrandCreate(**profile),
+            user_id=user_id,
+        )

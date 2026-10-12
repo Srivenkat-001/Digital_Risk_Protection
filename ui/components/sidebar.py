@@ -20,6 +20,7 @@ PAGES = [
     ("Investigations", "🔍"),
     ("Scan History", "⏱️"),
     ("Reports & Exports", "📑"),
+    ("AI Help & Raw Data", "🤖"),
     ("Settings", "⚙️"),
 ]
 

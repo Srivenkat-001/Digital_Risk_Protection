@@ -145,7 +145,7 @@ def apply_theme():
             --bp-surface: #111a2b;
             --bp-border: #293750;
             --bp-text: #edf4ff;
-            --bp-muted: #a6b5ca;
+            --bp-muted: #bdcbe0;
             --bp-teal: #72e4df;
         }
         .stApp {
@@ -325,6 +325,239 @@ def apply_theme():
         @media (max-width: 700px) {
             .bp-source-status > span:last-child { margin-left: 18px; }
             .bp-brand-lockup-centered .bp-brand-copy strong { font-size: 1.65rem; }
+        }
+        [data-testid="stMainBlockContainer"] {
+            max-width: 1560px;
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
+        [data-testid="stSidebar"] [data-testid="stButton"] > button {
+            min-height: 2.7rem;
+            justify-content: flex-start;
+            padding-left: 1rem;
+            border-color: transparent;
+            background: transparent;
+            color: #c8d5e8;
+            transition: background .16s ease, border-color .16s ease, transform .16s ease;
+        }
+        [data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
+            background: rgba(114, 228, 223, .09);
+            border-color: rgba(114, 228, 223, .22);
+            color: #f4f8ff;
+            transform: translateX(2px);
+        }
+        [data-testid="stSidebar"] [data-testid="stButton"] > button[kind="primary"] {
+            background: linear-gradient(100deg, rgba(30, 153, 164, .25), rgba(113, 94, 211, .22));
+            border: 1px solid rgba(114, 228, 223, .35);
+            color: #f5fbff;
+            box-shadow: inset 3px 0 #72e4df;
+        }
+        [data-testid="stSidebar"] [data-testid="stSelectbox"] [data-baseweb="select"] > div {
+            min-height: 2.7rem;
+        }
+        .bp-page-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 1.5rem 1.7rem;
+            margin: 0 0 1.25rem;
+            border: 1px solid rgba(105, 142, 183, .28);
+            border-radius: 18px;
+            background:
+                radial-gradient(circle at 92% 5%, rgba(123, 102, 229, .25), transparent 34%),
+                linear-gradient(115deg, rgba(21, 43, 63, .98), rgba(17, 26, 43, .98) 62%, rgba(25, 28, 57, .98));
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .2);
+        }
+        .bp-page-hero::after {
+            position: absolute;
+            right: -55px;
+            bottom: -115px;
+            width: 240px;
+            height: 240px;
+            border: 1px solid rgba(114, 228, 223, .13);
+            border-radius: 50%;
+            box-shadow: 0 0 0 26px rgba(114, 228, 223, .035), 0 0 0 54px rgba(114, 228, 223, .025);
+            content: "";
+            pointer-events: none;
+        }
+        .bp-hero-eyebrow {
+            margin-bottom: .45rem;
+            color: #80e7df;
+            font-size: .7rem;
+            font-weight: 800;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+        .bp-page-hero h1 {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            color: #f4f8ff;
+            font-size: clamp(1.55rem, 2.7vw, 2.25rem);
+            font-weight: 800;
+            letter-spacing: -.04em;
+            line-height: 1.15;
+        }
+        .bp-page-hero p {
+            position: relative;
+            z-index: 1;
+            max-width: 760px;
+            margin: .6rem 0 0;
+            color: #c1d0e3;
+            font-size: .96rem;
+            line-height: 1.55;
+        }
+        .bp-section-heading {
+            margin: 1.45rem 0 .75rem;
+            color: #eff5ff;
+            font-size: 1.15rem;
+            font-weight: 750;
+            letter-spacing: -.02em;
+        }
+        .bp-card {
+            position: relative;
+            min-height: 130px;
+            padding: 18px 19px;
+        }
+        .bp-card::before {
+            position: absolute;
+            top: 17px;
+            right: 17px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #72e4df;
+            box-shadow: 0 0 14px rgba(114, 228, 223, .55);
+            content: "";
+        }
+        .bp-card-value { margin-top: 9px; font-size: 2rem; letter-spacing: -.04em; }
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            background: linear-gradient(145deg, rgba(21, 33, 52, .88), rgba(15, 24, 39, .9));
+            border-color: rgba(105, 129, 160, .28);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, .12);
+        }
+        [data-testid="stVerticalBlockBorderWrapper"]:hover {
+            border-color: rgba(114, 228, 223, .36);
+        }
+        [data-testid="stTextInput"] [data-baseweb="input"] > div,
+        [data-testid="stTextArea"] [data-baseweb="textarea"],
+        [data-testid="stNumberInput"] [data-baseweb="input"] > div,
+        [data-testid="stDateInput"] [data-baseweb="input"] > div,
+        [data-testid="stTimeInput"] [data-baseweb="input"] > div,
+        [data-testid="stTextInputField"] [data-baseweb="input"] > div {
+            background: #172338 !important;
+            border: 1px solid #607794 !important;
+            border-radius: 10px !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .18);
+        }
+        [data-testid="stTextInput"] input,
+        [data-testid="stTextArea"] textarea,
+        [data-testid="stNumberInput"] input,
+        [data-testid="stDateInput"] input,
+        [data-testid="stTimeInput"] input {
+            color: #f4f8ff !important;
+            -webkit-text-fill-color: #f4f8ff !important;
+            caret-color: #72e4df !important;
+        }
+        [data-testid="stTextInput"] input::placeholder,
+        [data-testid="stTextArea"] textarea::placeholder {
+            color: #bdcbe0 !important;
+            -webkit-text-fill-color: #bdcbe0 !important;
+        }
+        [data-testid="stTextInput"] [data-baseweb="input"]:focus-within > div,
+        [data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
+        [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within > div {
+            border-color: #72e4df !important;
+            box-shadow: 0 0 0 3px rgba(114, 228, 223, .14) !important;
+        }
+        [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+        [data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+            background: #172338 !important;
+            border: 1px solid #607794 !important;
+            border-radius: 10px !important;
+        }
+        [data-testid="stSelectbox"] [role="combobox"],
+        [data-testid="stSelectbox"] [role="combobox"] *,
+        [data-testid="stMultiSelect"] [role="combobox"],
+        [data-testid="stMultiSelect"] [role="combobox"] * {
+            color: #f4f8ff !important;
+            -webkit-text-fill-color: #f4f8ff !important;
+        }
+        [role="listbox"], [role="option"] { background: #f8fbff !important; color: #172338 !important; }
+        [role="option"] * { color: #172338 !important; }
+        [data-testid="stWidgetLabel"] p,
+        [data-testid="stWidgetLabel"] label,
+        [data-testid="stCheckbox"] label,
+        [data-testid="stRadio"] label {
+            color: #e3edf9 !important;
+            font-weight: 600;
+        }
+        [data-testid="stTabs"] [role="tablist"] {
+            gap: .35rem;
+            border-bottom: 1px solid #2a3b52;
+        }
+        [data-testid="stTabs"] button[role="tab"] {
+            min-height: 2.8rem;
+            border-radius: 10px 10px 0 0;
+            color: #bfcee1 !important;
+            font-weight: 650;
+        }
+        [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+            background: rgba(114, 228, 223, .08);
+            color: #85e8e1 !important;
+        }
+        .stButton > button, [data-testid="stFormSubmitButton"] > button {
+            min-height: 2.65rem;
+            border: 1px solid #40546f;
+            border-radius: 10px;
+            color: #edf4ff;
+            font-weight: 700;
+            transition: transform .15s ease, border-color .15s ease, background .15s ease;
+        }
+        .stButton > button:hover, [data-testid="stFormSubmitButton"] > button:hover {
+            border-color: #72e4df;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .stButton > button[kind="primary"], [data-testid="stFormSubmitButton"] > button[kind="primaryFormSubmit"] {
+            border: 1px solid rgba(114, 228, 223, .35);
+            background: linear-gradient(105deg, #148e98, #6859c9);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(42, 123, 157, .2);
+        }
+        [data-testid="stAlert"] {
+            border-radius: 12px;
+            border: 1px solid rgba(116, 153, 191, .28);
+        }
+        [data-testid="stAlert"] p,
+        [data-testid="stAlert"] [data-testid="stMarkdownContainer"] { color: #edf4ff !important; }
+        [data-testid="stExpander"] {
+            overflow: hidden;
+            border: 1px solid rgba(105, 129, 160, .32);
+            border-radius: 11px;
+            background: rgba(16, 26, 42, .6);
+        }
+        [data-testid="stExpander"] summary { color: #e6effb; font-weight: 650; }
+        [data-testid="stDataFrame"] {
+            border: 1px solid rgba(105, 129, 160, .32);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        [data-testid="stCode"] {
+            border: 1px solid rgba(105, 129, 160, .25);
+            border-radius: 9px;
+        }
+        .bp-demo-banner {
+            border-color: rgba(238, 177, 96, .5);
+            border-radius: 12px;
+            background: rgba(125, 82, 23, .18);
+            color: #ffe0aa;
+        }
+        .bp-source-status { border-radius: 12px; }
+        .bp-badge { padding: 5px 10px; border-radius: 999px; }
+        hr { border-color: rgba(105, 129, 160, .22); }
+        @media (max-width: 850px) {
+            [data-testid="stMainBlockContainer"] { padding: 1.1rem 1rem 2rem; }
+            .bp-page-hero { padding: 1.2rem; border-radius: 14px; }
         }
     </style>
     """

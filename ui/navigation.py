@@ -12,6 +12,7 @@ from ui.components.brand_mark import render_brand_mark
 from ui.components.sidebar import render_sidebar
 from ui.pages import (
     app_monitoring,
+    assistant,
     brands,
     dashboard,
     findings,
@@ -101,6 +102,8 @@ def dispatch_page(db: Session):
         scan_history.render(db, org.id, effective_brand_id)
     elif current_page == "Reports & Exports":
         reports.render(db, org.id, effective_brand_id)
+    elif current_page == "AI Help & Raw Data":
+        assistant.render(db, org.id, effective_brand_id)
     elif current_page == "Settings":
         settings.render(db, org.id)
     else:

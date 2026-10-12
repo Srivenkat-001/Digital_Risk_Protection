@@ -20,8 +20,20 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     service = DashboardService(db)
     metrics = service.get_dashboard_summary(organization_id, brand_id)
 
-    st.markdown("## 📊 Threat Intelligence & Monitoring Dashboard")
-    st.caption("Database-backed risk and triage overview. Bluesky public-profile search and Apple App Store lookup are opt-in; sample records are labeled synthetic.")
+    st.markdown(
+        """
+        <section class="bp-page-hero">
+            <div class="bp-hero-eyebrow">BrandPhantom · Security Operations</div>
+            <h1>Threat Intelligence Dashboard</h1>
+            <p>Monitor possible impersonation, review explainable risk signals, and track analyst response across your registered brands.</p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        "Bluesky public-profile search and Apple App Store lookup are opt-in. "
+        "Sample records are labeled synthetic."
+    )
 
     # Synthetic Demo Alert
     if metrics["is_synthetic_data_present"]:
@@ -39,14 +51,16 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
             unsafe_allow_html=True,
         )
 
-    # Top KPI Metrics Row
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
+    # KPI cards use two rows so their labels remain readable on laptop screens.
+    c1, c2, c3 = st.columns(3)
     with c1:
         render_metric_card("Registered Brands", metrics["total_brands"], "Active Profiles")
     with c2:
         render_metric_card("Candidates Seen", metrics["total_candidates"], "Social & App Records")
     with c3:
         render_metric_card("Active Findings", metrics["total_findings"], f"{metrics['new_findings']} Unreviewed")
+
+    c4, c5, c6 = st.columns(3)
     with c4:
         render_metric_card("Confirmed Threats", metrics["confirmed_threats"], "Verified Imposters", "Threats confirmed by analyst review")
     with c5:
@@ -54,7 +68,7 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     with c6:
         render_metric_card("Open Cases", metrics["open_cases_count"], "Active Investigations")
 
-    st.markdown("---")
+    st.markdown('<div class="bp-section-heading">Risk & review activity</div>', unsafe_allow_html=True)
 
     # Visualizations Row
     chart_col1, chart_col2 = st.columns(2)
@@ -63,7 +77,7 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     with chart_col2:
         render_status_bar(metrics["status_distribution"])
 
-    st.markdown("---")
+    st.markdown('<div class="bp-section-heading">Analyst attention</div>', unsafe_allow_html=True)
 
     # High-Priority Review Queue & Source Health
     queue_col, health_col = st.columns([3, 2])
