@@ -62,7 +62,7 @@ For a live presentation, use only the demo database and do not imply that any di
 
 | Evaluation area | Implemented and verified | Partial or outstanding |
 |---|---|---|
-| Brand profile | Tenant-scoped profiles, aliases, approved domains, official social/app assets, logo upload/hash, registration and deletion; scan targets use the selected brand. | Profile editing, duplicate-asset UX, unverified-asset review, and deletion confirmation need completion. |
+| Brand profile | Tenant-scoped profiles, editable profile fields/aliases/domains, confirmed deletion, URL validation, duplicate-asset checks, verification-state tracking, official social/app assets, logo upload/hash, and brand-specific scans. | Editing/removing individual registered social/app assets is not yet exposed as a UI workflow. |
 | Social monitoring | Opt-in Bluesky public-profile search; bounded requests, normalization, deduplication, source metadata, synthetic/live labels, and a mocked connector test. | Live API smoke test is opt-in (`pytest -m live`); X, Instagram, Facebook, and other networks are unavailable. Bluesky search is not comprehensive or real-time. |
 | App-store monitoring | Opt-in Apple App Store public search; listing metadata mapping, package-ID deduplication, source metadata, and a mocked connector test. | Google Play live collection, icon retrieval/comparison for collected apps, and additional store catalogs are not implemented. Apple search is capped and may omit listings. |
 | Look-alike detection | Unicode-aware normalization, fuzzy/rule-based signals, scoring, explanations, synthetic adversarial examples, and unit/integration tests. | Heuristic scores are not trained AI and require analyst review; calibration on verified real-world data remains outstanding. |

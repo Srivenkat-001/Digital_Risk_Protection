@@ -11,6 +11,7 @@ from detection.logo_similarity import compute_dhash
 from jobs.scan_runner import run_brand_scan
 from schemas.brand import (
     BrandCreate,
+    BrandUpdate,
     OfficialAppListingBase,
     OfficialSocialAccountBase,
 )
@@ -29,7 +30,9 @@ def render(db: Session, organization_id: str):
     st.caption("Configure official corporate identities, verified assets, and approved digital presence.")
     st.info("Included scan connectors return synthetic demo candidates only; no social network or app store is queried.")
 
-    tab_list, tab_create = st.tabs(["📋 Registered Brands", "➕ Register New Brand"])
+    tab_list, tab_create, tab_edit = st.tabs(
+        ["📋 Registered Brands", "➕ Register New Brand", "✏️ Edit Brand Profile"]
+    )
 
     # --- TAB 1: REGISTERED BRANDS ---
     with tab_list:
@@ -50,8 +53,8 @@ def render(db: Session, organization_id: str):
                             st.write(b.description)
 
                         # Asset Badges
-                        soc_count = len(b.official_social_accounts)
-                        app_count = len(b.official_app_listings)
+                        soc_count = sum(account.is_verified for account in b.official_social_accounts)
+                        app_count = sum(app.is_verified for app in b.official_app_listings)
                         dom_count = len(b.approved_domains)
                         alias_count = len(b.aliases)
                         logo_count = len(b.logos)
@@ -59,8 +62,8 @@ def render(db: Session, organization_id: str):
                         st.markdown(
                             f"""
                             <div style="display:flex; gap:8px; margin-top:8px;">
-                                <span class="bp-badge bp-status-new">📱 {soc_count} Verified Social Handles</span>
-                                <span class="bp-badge bp-status-new">📦 {app_count} Official Apps</span>
+                                <span class="bp-badge bp-status-new">📱 {soc_count} Verified / {len(b.official_social_accounts)} Social Handles</span>
+                                <span class="bp-badge bp-status-new">📦 {app_count} Verified / {len(b.official_app_listings)} Apps</span>
                                 <span class="bp-badge bp-status-false-pos">🌐 {dom_count} Approved Domains</span>
                                 <span class="bp-badge bp-status-false-pos">🏷️ {alias_count} Aliases</span>
                                 <span class="bp-badge bp-status-false-pos">🖼️ {logo_count} Reference Logos</span>
@@ -86,8 +89,31 @@ def render(db: Session, organization_id: str):
 
                         if can_delete:
                             if st.button("🗑️ Delete Brand", key=f"del_btn_{b.id}", use_container_width=True):
-                                brand_service.delete_brand(b.id, organization_id, user_id=user.id if user else None)
-                                st.warning(f"Brand '{b.name}' deleted.")
+                                st.session_state["confirm_delete_brand_id"] = b.id
+                                st.rerun()
+
+                    if st.session_state.get("confirm_delete_brand_id") == b.id:
+                        st.warning(
+                            f"Deleting '{b.display_name}' permanently removes its profile, assets, findings, and scans."
+                        )
+                        confirm_col, cancel_col = st.columns(2)
+                        with confirm_col:
+                            if st.button(
+                                "Confirm permanent deletion",
+                                key=f"confirm_del_{b.id}",
+                                type="primary",
+                            ):
+                                brand_service.delete_brand(
+                                    b.id,
+                                    organization_id,
+                                    user_id=user.id if user else None,
+                                )
+                                st.session_state.pop("confirm_delete_brand_id", None)
+                                st.success(f"Brand '{b.name}' deleted.")
+                                st.rerun()
+                        with cancel_col:
+                            if st.button("Cancel deletion", key=f"cancel_del_{b.id}"):
+                                st.session_state.pop("confirm_delete_brand_id", None)
                                 st.rerun()
 
                     # View Verified Assets Expander
@@ -98,7 +124,8 @@ def render(db: Session, organization_id: str):
                             if not b.official_social_accounts:
                                 st.caption("No official social handles configured.")
                             for acc in b.official_social_accounts:
-                                st.markdown(f"- **{acc.platform}**: `@{acc.handle}`")
+                                verification = "Verified exclusion" if acc.is_verified else "Unverified; not excluded"
+                                st.markdown(f"- **{acc.platform}**: `@{acc.handle}` — {verification}")
                                 st.code(acc.account_url, language=None)
                                 if acc.platform_account_id:
                                     st.caption(f"Platform ID: `{acc.platform_account_id}`")
@@ -107,7 +134,8 @@ def render(db: Session, organization_id: str):
                             if not b.official_app_listings:
                                 st.caption("No official mobile apps configured.")
                             for app in b.official_app_listings:
-                                st.markdown(f"- **{app.store}**: `{app.package_id}`")
+                                verification = "Verified exclusion" if app.is_verified else "Unverified; not excluded"
+                                st.markdown(f"- **{app.store}**: `{app.package_id}` — {verification}")
                                 st.caption(f"Publisher: {app.publisher_name} | Name: {app.app_name}")
 
     # --- TAB 2: REGISTER NEW BRAND ---
@@ -140,6 +168,11 @@ def render(db: Session, organization_id: str):
                 social_handle = st.text_input("Official Handle", placeholder="e.g. AcmePayOfficial")
             with sc3:
                 social_url = st.text_input("Profile URL", placeholder="https://twitter.com/AcmePayOfficial")
+            social_verified = st.checkbox(
+                "I verified that this account is controlled by the brand",
+                value=False,
+                key="new_brand_social_verified",
+            )
 
             st.markdown("#### Primary Verified Mobile App Listing (For Trusted Exclusion)")
             ac1, ac2, ac3 = st.columns(3)
@@ -152,6 +185,11 @@ def render(db: Session, organization_id: str):
 
             app_title = st.text_input("App Title", placeholder="e.g. AcmePay: Send Money & Pay")
             app_store_url = st.text_input("Store URL", placeholder="https://play.google.com/store/apps/details?id=com.acmepay.wallet")
+            app_verified = st.checkbox(
+                "I verified that this listing is controlled by the brand",
+                value=False,
+                key="new_brand_app_verified",
+            )
 
             st.markdown("#### Official Brand Logo Reference")
             logo_upload = st.file_uploader(
@@ -189,7 +227,7 @@ def render(db: Session, organization_id: str):
                                 platform=social_platform,
                                 handle=social_handle.lstrip("@"),
                                 account_url=social_url,
-                                is_verified=True,
+                                is_verified=social_verified,
                                 notes="Configured during registration",
                             ))
 
@@ -201,7 +239,7 @@ def render(db: Session, organization_id: str):
                                 package_id=app_package,
                                 publisher_name=app_publisher,
                                 store_url=app_store_url,
-                                is_verified=True,
+                                is_verified=app_verified,
                                 notes="Configured during registration",
                             ))
 
@@ -231,8 +269,62 @@ def render(db: Session, organization_id: str):
                                 is_primary=True,
                             )
 
-                        st.success(f"Successfully registered brand '{new_brand.name}' with verified exclusion assets!")
+                        st.success(f"Successfully registered brand '{new_brand.name}' and its configured assets.")
                         st.rerun()
 
                     except Exception as e:
                         st.error(f"Failed to register brand: {e}")
+
+    with tab_edit:
+        if not can_edit:
+            st.warning("🔒 Administrator or Threat Analyst role required to edit brands.")
+        else:
+            brands = brand_service.list_brands(organization_id)
+            if not brands:
+                st.info("Register a brand before editing its profile.")
+            else:
+                selected_brand = st.selectbox(
+                    "Brand to edit",
+                    brands,
+                    format_func=lambda brand: f"{brand.display_name} ({brand.name})",
+                    key="brand_edit_selection",
+                )
+                st.caption("Official account and app assets are preserved. Only profile details, aliases, and approved domains are changed here.")
+                with st.form(f"edit_brand_form_{selected_brand.id}"):
+                    name = st.text_input("Brand Identifier / Common Name*", value=selected_brand.name)
+                    display_name = st.text_input("Public Display Name*", value=selected_brand.display_name)
+                    legal_name = st.text_input("Legal Entity Name", value=selected_brand.legal_name or "")
+                    official_website = st.text_input("Primary Official Website*", value=selected_brand.official_website)
+                    industry = st.text_input("Industry", value=selected_brand.industry or "")
+                    description = st.text_area("Brand Summary & Business Description", value=selected_brand.description or "")
+                    aliases = st.text_input(
+                        "Brand aliases (comma separated)",
+                        value=", ".join(alias.alias for alias in selected_brand.aliases),
+                    )
+                    domains = st.text_input(
+                        "Approved domains (comma separated)",
+                        value=", ".join(domain.domain for domain in selected_brand.approved_domains),
+                    )
+                    is_active = st.checkbox("Brand profile active", value=selected_brand.is_active)
+                    if st.form_submit_button("Save Brand Profile", type="primary"):
+                        try:
+                            updated = brand_service.update_brand(
+                                selected_brand.id,
+                                organization_id,
+                                BrandUpdate(
+                                    name=name,
+                                    display_name=display_name,
+                                    legal_name=legal_name or None,
+                                    official_website=official_website,
+                                    industry=industry or None,
+                                    description=description or None,
+                                    is_active=is_active,
+                                    aliases=[item.strip() for item in aliases.split(",") if item.strip()],
+                                    approved_domains=[item.strip() for item in domains.split(",") if item.strip()],
+                                ),
+                                user_id=user.id if user else None,
+                            )
+                            st.success(f"Saved profile changes for '{updated.display_name}'.")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Failed to update brand: {e}")

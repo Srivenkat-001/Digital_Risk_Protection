@@ -78,10 +78,21 @@ class BrandRepository:
 
     def update(self, brand: Brand, **kwargs) -> Brand:
         for key, value in kwargs.items():
-            if hasattr(brand, key) and value is not None:
+            if hasattr(brand, key):
                 setattr(brand, key, value)
         self.db.flush()
         return brand
+
+    def replace_aliases(self, brand: Brand, aliases: list[str]) -> None:
+        brand.aliases = [BrandAlias(brand_id=brand.id, alias=alias) for alias in aliases]
+        self.db.flush()
+
+    def replace_domains(self, brand: Brand, domains: list[str]) -> None:
+        brand.approved_domains = [
+            BrandDomain(brand_id=brand.id, domain=domain.strip().lower(), is_approved=True)
+            for domain in domains
+        ]
+        self.db.flush()
 
     def add_alias(self, brand_id: str, alias: str) -> BrandAlias:
         brand_alias = BrandAlias(brand_id=brand_id, alias=alias.strip())
@@ -122,6 +133,7 @@ class BrandRepository:
         account_url: str,
         platform_account_id: str | None = None,
         notes: str | None = None,
+        is_verified: bool = True,
     ) -> OfficialSocialAccount:
         account = OfficialSocialAccount(
             brand_id=brand_id,
@@ -129,7 +141,7 @@ class BrandRepository:
             handle=handle.strip().lstrip("@"),
             account_url=account_url.strip(),
             platform_account_id=platform_account_id.strip() if platform_account_id else None,
-            is_verified=True,
+            is_verified=is_verified,
             notes=notes,
         )
         self.db.add(account)
@@ -148,6 +160,7 @@ class BrandRepository:
         publisher_name: str,
         store_url: str,
         notes: str | None = None,
+        is_verified: bool = True,
     ) -> OfficialAppListing:
         app_listing = OfficialAppListing(
             brand_id=brand_id,
@@ -156,7 +169,7 @@ class BrandRepository:
             package_id=package_id.strip(),
             publisher_name=publisher_name.strip(),
             store_url=store_url.strip(),
-            is_verified=True,
+            is_verified=is_verified,
             notes=notes,
         )
         self.db.add(app_listing)
