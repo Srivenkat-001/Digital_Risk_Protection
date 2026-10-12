@@ -560,91 +560,94 @@ def apply_theme():
             .bp-page-hero { padding: 1.2rem; border-radius: 14px; }
         }
         :root {
-            --bp-bg: #09111f;
-            --bp-surface: #111c2d;
-            --bp-raised: #17263b;
-            --bp-border: #293a52;
-            --bp-text: #f1f5fb;
-            --bp-muted: #b8c6d9;
-            --bp-blue: #79a8ff;
-            --bp-cyan: #65e2e2;
+            --bp-bg: #0d0c1b;
+            --bp-surface: #17162a;
+            --bp-raised: #211f3b;
+            --bp-border: #393553;
+            --bp-text: #f5f2ff;
+            --bp-muted: #c5c0dc;
+            --bp-blue: #ad91ff;
+            --bp-cyan: #5ce1d0;
         }
         .stApp {
             background:
-                radial-gradient(ellipse at 8% 0%, rgba(71, 103, 220, .17), transparent 36%),
-                radial-gradient(ellipse at 96% 8%, rgba(36, 184, 202, .1), transparent 30%),
+                radial-gradient(ellipse at 8% 0%, rgba(116, 74, 208, .24), transparent 38%),
+                radial-gradient(ellipse at 96% 8%, rgba(20, 176, 164, .13), transparent 32%),
                 var(--bp-bg);
             color: var(--bp-text);
         }
         header[data-testid="stHeader"] {
-            background: rgba(9, 17, 31, .94);
-            border-bottom-color: rgba(111, 143, 180, .18);
+            background: rgba(13, 12, 27, .96);
+            border-bottom-color: rgba(156, 131, 224, .2);
         }
         [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #101b2c, #0c1524 76%);
-            border-right-color: rgba(111, 143, 180, .2);
+            background: linear-gradient(180deg, #17152c, #100f20 78%);
+            border-right-color: rgba(156, 131, 224, .2);
         }
         .bp-user-card {
             padding: 10px 12px;
             margin-bottom: 14px;
-            border: 1px solid rgba(101, 128, 161, .25);
+            border: 1px solid rgba(156, 131, 224, .26);
             border-radius: 10px;
-            background: rgba(20, 33, 52, .72);
+            background: linear-gradient(135deg, rgba(43, 35, 74, .55), rgba(22, 30, 49, .72));
         }
         .bp-user-name { color: var(--bp-text); font-size: .85rem; font-weight: 700; }
         .bp-user-email { color: var(--bp-muted); font-size: .75rem; overflow-wrap: anywhere; }
         .bp-user-role { margin-top: 7px; }
         .bp-demo-mode {
             padding: 9px 11px;
-            border: 1px solid rgba(89, 184, 255, .24);
+            border: 1px solid rgba(92, 225, 208, .26);
             border-radius: 10px;
-            background: rgba(34, 91, 137, .12);
-            color: #a9d8ff;
+            background: rgba(34, 128, 119, .13);
+            color: #9cebdd;
             font-size: .75rem;
         }
-        .bp-brand-icon { filter: drop-shadow(0 5px 16px rgba(91, 137, 255, .34)); }
-        .bp-brand-copy small, .bp-hero-eyebrow { color: #79dff0; }
+        .bp-brand-icon { filter: drop-shadow(0 5px 17px rgba(151, 113, 255, .4)); }
+        .bp-brand-copy small, .bp-hero-eyebrow { color: #70e6d6; }
         .bp-brand-copy strong { color: var(--bp-text); }
         .bp-page-hero {
-            border-color: rgba(121, 168, 255, .27);
+            border-color: rgba(173, 145, 255, .36);
             background:
-                radial-gradient(circle at 94% 5%, rgba(109, 91, 226, .22), transparent 36%),
-                radial-gradient(circle at 5% 110%, rgba(39, 155, 189, .12), transparent 40%),
-                linear-gradient(115deg, #182744, #111c2d 64%, #151d39);
-            box-shadow: 0 18px 44px rgba(0, 0, 0, .2);
+                radial-gradient(circle at 92% 0%, rgba(145, 88, 232, .38), transparent 39%),
+                radial-gradient(circle at 0% 110%, rgba(30, 197, 177, .2), transparent 45%),
+                linear-gradient(115deg, #211b3e, #17172d 58%, #142a38);
+            box-shadow: 0 20px 48px rgba(5, 4, 18, .36), inset 0 1px rgba(255, 255, 255, .04);
         }
         .bp-page-hero::after {
-            border-color: rgba(121, 168, 255, .16);
-            box-shadow: 0 0 0 26px rgba(121, 168, 255, .04), 0 0 0 54px rgba(121, 168, 255, .025);
+            border-color: rgba(173, 145, 255, .2);
+            box-shadow: 0 0 0 26px rgba(173, 145, 255, .06), 0 0 0 54px rgba(92, 225, 208, .035);
         }
         .bp-page-hero h1, .bp-section-heading { color: var(--bp-text); }
         .bp-page-hero p, .bp-card-title, .bp-card-caption { color: var(--bp-muted); }
         .bp-card {
-            border-color: rgba(101, 128, 161, .27);
-            background: linear-gradient(145deg, rgba(22, 36, 56, .97), rgba(16, 27, 44, .97));
+            border-color: rgba(156, 131, 224, .24);
+            background:
+                radial-gradient(circle at 100% 0%, rgba(110, 75, 178, .13), transparent 48%),
+                linear-gradient(145deg, rgba(29, 27, 51, .98), rgba(18, 25, 41, .98));
+            box-shadow: 0 12px 30px rgba(5, 4, 18, .24), inset 0 1px rgba(255, 255, 255, .035);
         }
         .bp-card::before {
-            background: linear-gradient(135deg, #65e2e2, #7e8fff);
-            box-shadow: 0 0 13px rgba(101, 226, 226, .48);
+            background: linear-gradient(135deg, #5ce1d0, #ad91ff);
+            box-shadow: 0 0 15px rgba(137, 112, 239, .58);
         }
         .bp-card:hover, [data-testid="stVerticalBlockBorderWrapper"]:hover {
-            border-color: rgba(121, 168, 255, .5);
+            border-color: rgba(173, 145, 255, .56);
         }
         [data-testid="stVerticalBlockBorderWrapper"] {
-            border-color: rgba(101, 128, 161, .24);
-            background: linear-gradient(145deg, rgba(19, 31, 49, .9), rgba(14, 24, 39, .94));
+            border-color: rgba(126, 111, 169, .28);
+            background: linear-gradient(145deg, rgba(27, 25, 46, .94), rgba(16, 23, 38, .97));
         }
         [data-testid="stSidebar"] [data-testid="stButton"] > button {
             color: #c4d0df;
         }
         [data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
-            background: rgba(121, 168, 255, .09);
-            border-color: rgba(121, 168, 255, .24);
+            background: linear-gradient(90deg, rgba(148, 104, 225, .16), rgba(40, 189, 172, .08));
+            border-color: rgba(173, 145, 255, .3);
         }
         [data-testid="stSidebar"] [data-testid="stButton"] > button[kind="primary"] {
-            background: linear-gradient(100deg, rgba(71, 105, 213, .25), rgba(29, 148, 166, .17));
-            border-color: rgba(121, 168, 255, .34);
-            box-shadow: inset 3px 0 #79a8ff;
+            background: linear-gradient(100deg, rgba(125, 82, 205, .28), rgba(24, 150, 145, .2));
+            border-color: rgba(173, 145, 255, .4);
+            box-shadow: inset 3px 0 #ad91ff, 0 5px 18px rgba(6, 4, 22, .17);
         }
         [data-baseweb="input"] > div,
         [data-baseweb="select"] > div,
@@ -654,8 +657,8 @@ def apply_theme():
         [data-testid="stDateInput"] [data-baseweb="input"] > div,
         [data-testid="stTimeInput"] [data-baseweb="input"] > div,
         [data-testid="stTextInputField"] [data-baseweb="input"] > div {
-            background-color: #142136 !important;
-            border-color: #526780 !important;
+            background-color: #19182e !important;
+            border-color: #655c83 !important;
         }
         [data-testid="stTextInput"] input,
         [data-testid="stTextArea"] textarea,
@@ -672,15 +675,15 @@ def apply_theme():
         }
         [data-testid="stTextInput"] input::placeholder,
         [data-testid="stTextArea"] textarea::placeholder {
-            color: #a9b8cb !important;
-            -webkit-text-fill-color: #a9b8cb !important;
+            color: #b8b2cc !important;
+            -webkit-text-fill-color: #b8b2cc !important;
         }
         [data-testid="stTextInput"] [data-baseweb="input"]:focus-within > div,
         [data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
         [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within > div,
         [data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div {
             border-color: var(--bp-blue) !important;
-            box-shadow: 0 0 0 3px rgba(121, 168, 255, .18) !important;
+            box-shadow: 0 0 0 3px rgba(173, 145, 255, .2) !important;
         }
         [data-testid="stWidgetLabel"] *,
         [data-testid="stCheckbox"] label,
@@ -688,7 +691,7 @@ def apply_theme():
         [data-testid="stTabs"] [role="tablist"] { border-bottom-color: var(--bp-border); }
         [data-testid="stTabs"] button[role="tab"] { color: #bdc9d9 !important; }
         [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-            background: linear-gradient(90deg, rgba(121, 168, 255, .1), rgba(101, 226, 226, .06));
+            background: linear-gradient(90deg, rgba(173, 145, 255, .15), rgba(92, 225, 208, .08));
             color: var(--bp-blue) !important;
         }
         .stButton > button, [data-testid="stFormSubmitButton"] > button {
@@ -700,9 +703,9 @@ def apply_theme():
         }
         .stButton > button[kind="primary"],
         [data-testid="stFormSubmitButton"] > button[kind="primaryFormSubmit"] {
-            border-color: rgba(121, 168, 255, .42);
-            background: linear-gradient(105deg, #397fe0, #6358d9 58%, #118fa5);
-            box-shadow: 0 7px 20px rgba(65, 100, 215, .25);
+            border-color: rgba(196, 174, 255, .4);
+            background: linear-gradient(105deg, #7750d4, #a64fc2 55%, #159e9d);
+            box-shadow: 0 8px 23px rgba(105, 64, 195, .3);
         }
         [data-testid="stAlert"] {
             background: rgba(18, 31, 49, .92);
@@ -726,7 +729,7 @@ def apply_theme():
         .bp-source-status-live .bp-source-dot { background: #45c99a; box-shadow: 0 0 11px rgba(69, 201, 154, .7); }
         .bp-source-status-off { border-color: rgba(224, 168, 83, .42); }
         .bp-source-dot { background: #e0a853; }
-        .bp-status-new { background: rgba(89, 184, 255, .1); color: #8bcaff; border-color: #3d83b6; }
+        .bp-status-new { background: rgba(173, 145, 255, .12); color: #c3adff; border-color: #755cb4; }
         .bp-status-threat { background: rgba(255, 107, 120, .12); color: #ff929b; border-color: #b8515d; }
         .bp-status-false-pos { background: rgba(168, 182, 202, .1); color: #c0cad8; border-color: #66778e; }
         .bp-status-investigating { background: rgba(244, 201, 107, .1); color: #f4cf7e; border-color: #ad8840; }

@@ -15,7 +15,7 @@ SEVERITY_COLORS = {
 }
 
 STATUS_COLORS = {
-    "New": "#5ea9ff",
+    "New": "#ad91ff",
     "Needs Review": "#f4c96b",
     "Investigating": "#ff9f5a",
     "Confirmed Threat": "#ff6b78",
