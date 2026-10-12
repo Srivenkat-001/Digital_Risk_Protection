@@ -141,12 +141,12 @@ def apply_theme():
             transition: all 0.15s ease;
         }
         :root {
-            --bp-bg: #0b1120;
-            --bp-surface: #111a2b;
-            --bp-border: #293750;
-            --bp-text: #edf4ff;
-            --bp-muted: #bdcbe0;
-            --bp-teal: #72e4df;
+            --bp-bg: #09111f;
+            --bp-surface: #111c2d;
+            --bp-border: #293a52;
+            --bp-text: #f1f5fb;
+            --bp-muted: #b8c6d9;
+            --bp-teal: #72dff2;
         }
         .stApp {
             background:
@@ -558,6 +558,191 @@ def apply_theme():
         @media (max-width: 850px) {
             [data-testid="stMainBlockContainer"] { padding: 1.1rem 1rem 2rem; }
             .bp-page-hero { padding: 1.2rem; border-radius: 14px; }
+        }
+        :root {
+            --bp-bg: #09111f;
+            --bp-surface: #111c2d;
+            --bp-raised: #17263b;
+            --bp-border: #293a52;
+            --bp-text: #f1f5fb;
+            --bp-muted: #b8c6d9;
+            --bp-blue: #79a8ff;
+            --bp-cyan: #65e2e2;
+        }
+        .stApp {
+            background:
+                radial-gradient(ellipse at 8% 0%, rgba(71, 103, 220, .17), transparent 36%),
+                radial-gradient(ellipse at 96% 8%, rgba(36, 184, 202, .1), transparent 30%),
+                var(--bp-bg);
+            color: var(--bp-text);
+        }
+        header[data-testid="stHeader"] {
+            background: rgba(9, 17, 31, .94);
+            border-bottom-color: rgba(111, 143, 180, .18);
+        }
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #101b2c, #0c1524 76%);
+            border-right-color: rgba(111, 143, 180, .2);
+        }
+        .bp-user-card {
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(101, 128, 161, .25);
+            border-radius: 10px;
+            background: rgba(20, 33, 52, .72);
+        }
+        .bp-user-name { color: var(--bp-text); font-size: .85rem; font-weight: 700; }
+        .bp-user-email { color: var(--bp-muted); font-size: .75rem; overflow-wrap: anywhere; }
+        .bp-user-role { margin-top: 7px; }
+        .bp-demo-mode {
+            padding: 9px 11px;
+            border: 1px solid rgba(89, 184, 255, .24);
+            border-radius: 10px;
+            background: rgba(34, 91, 137, .12);
+            color: #a9d8ff;
+            font-size: .75rem;
+        }
+        .bp-brand-icon { filter: drop-shadow(0 5px 16px rgba(91, 137, 255, .34)); }
+        .bp-brand-copy small, .bp-hero-eyebrow { color: #79dff0; }
+        .bp-brand-copy strong { color: var(--bp-text); }
+        .bp-page-hero {
+            border-color: rgba(121, 168, 255, .27);
+            background:
+                radial-gradient(circle at 94% 5%, rgba(109, 91, 226, .22), transparent 36%),
+                radial-gradient(circle at 5% 110%, rgba(39, 155, 189, .12), transparent 40%),
+                linear-gradient(115deg, #182744, #111c2d 64%, #151d39);
+            box-shadow: 0 18px 44px rgba(0, 0, 0, .2);
+        }
+        .bp-page-hero::after {
+            border-color: rgba(121, 168, 255, .16);
+            box-shadow: 0 0 0 26px rgba(121, 168, 255, .04), 0 0 0 54px rgba(121, 168, 255, .025);
+        }
+        .bp-page-hero h1, .bp-section-heading { color: var(--bp-text); }
+        .bp-page-hero p, .bp-card-title, .bp-card-caption { color: var(--bp-muted); }
+        .bp-card {
+            border-color: rgba(101, 128, 161, .27);
+            background: linear-gradient(145deg, rgba(22, 36, 56, .97), rgba(16, 27, 44, .97));
+        }
+        .bp-card::before {
+            background: linear-gradient(135deg, #65e2e2, #7e8fff);
+            box-shadow: 0 0 13px rgba(101, 226, 226, .48);
+        }
+        .bp-card:hover, [data-testid="stVerticalBlockBorderWrapper"]:hover {
+            border-color: rgba(121, 168, 255, .5);
+        }
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            border-color: rgba(101, 128, 161, .24);
+            background: linear-gradient(145deg, rgba(19, 31, 49, .9), rgba(14, 24, 39, .94));
+        }
+        [data-testid="stSidebar"] [data-testid="stButton"] > button {
+            color: #c4d0df;
+        }
+        [data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
+            background: rgba(121, 168, 255, .09);
+            border-color: rgba(121, 168, 255, .24);
+        }
+        [data-testid="stSidebar"] [data-testid="stButton"] > button[kind="primary"] {
+            background: linear-gradient(100deg, rgba(71, 105, 213, .25), rgba(29, 148, 166, .17));
+            border-color: rgba(121, 168, 255, .34);
+            box-shadow: inset 3px 0 #79a8ff;
+        }
+        [data-baseweb="input"] > div,
+        [data-baseweb="select"] > div,
+        [data-testid="stTextArea"] [data-baseweb="textarea"],
+        [data-testid="stTextInput"] [data-baseweb="input"] > div,
+        [data-testid="stNumberInput"] [data-baseweb="input"] > div,
+        [data-testid="stDateInput"] [data-baseweb="input"] > div,
+        [data-testid="stTimeInput"] [data-baseweb="input"] > div,
+        [data-testid="stTextInputField"] [data-baseweb="input"] > div {
+            background-color: #142136 !important;
+            border-color: #526780 !important;
+        }
+        [data-testid="stTextInput"] input,
+        [data-testid="stTextArea"] textarea,
+        [data-testid="stNumberInput"] input,
+        [data-testid="stDateInput"] input,
+        [data-testid="stTimeInput"] input,
+        [data-testid="stSelectbox"] [role="combobox"],
+        [data-testid="stSelectbox"] [role="combobox"] *,
+        [data-testid="stMultiSelect"] [role="combobox"],
+        [data-testid="stMultiSelect"] [role="combobox"] * {
+            color: var(--bp-text) !important;
+            -webkit-text-fill-color: var(--bp-text) !important;
+            caret-color: var(--bp-cyan) !important;
+        }
+        [data-testid="stTextInput"] input::placeholder,
+        [data-testid="stTextArea"] textarea::placeholder {
+            color: #a9b8cb !important;
+            -webkit-text-fill-color: #a9b8cb !important;
+        }
+        [data-testid="stTextInput"] [data-baseweb="input"]:focus-within > div,
+        [data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
+        [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within > div,
+        [data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div {
+            border-color: var(--bp-blue) !important;
+            box-shadow: 0 0 0 3px rgba(121, 168, 255, .18) !important;
+        }
+        [data-testid="stWidgetLabel"] *,
+        [data-testid="stCheckbox"] label,
+        [data-testid="stRadio"] label { color: #d6e0ed !important; }
+        [data-testid="stTabs"] [role="tablist"] { border-bottom-color: var(--bp-border); }
+        [data-testid="stTabs"] button[role="tab"] { color: #bdc9d9 !important; }
+        [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+            background: linear-gradient(90deg, rgba(121, 168, 255, .1), rgba(101, 226, 226, .06));
+            color: var(--bp-blue) !important;
+        }
+        .stButton > button, [data-testid="stFormSubmitButton"] > button {
+            border-color: #40536c;
+            color: var(--bp-text);
+        }
+        .stButton > button:hover, [data-testid="stFormSubmitButton"] > button:hover {
+            border-color: var(--bp-blue);
+        }
+        .stButton > button[kind="primary"],
+        [data-testid="stFormSubmitButton"] > button[kind="primaryFormSubmit"] {
+            border-color: rgba(121, 168, 255, .42);
+            background: linear-gradient(105deg, #397fe0, #6358d9 58%, #118fa5);
+            box-shadow: 0 7px 20px rgba(65, 100, 215, .25);
+        }
+        [data-testid="stAlert"] {
+            background: rgba(18, 31, 49, .92);
+            border-color: rgba(107, 138, 174, .32);
+        }
+        [data-testid="stAlert"] p,
+        [data-testid="stAlert"] [data-testid="stMarkdownContainer"] { color: #eaf1f9 !important; }
+        [data-testid="stExpander"] {
+            border-color: rgba(101, 128, 161, .28);
+            background: rgba(15, 26, 42, .78);
+        }
+        [data-testid="stExpander"] summary { color: #e5edf7; }
+        [data-testid="stDataFrame"] { border-color: rgba(101, 128, 161, .28); }
+        [data-testid="stCode"] { border-color: rgba(101, 128, 161, .25); }
+        .bp-demo-banner {
+            border-color: rgba(224, 168, 83, .45);
+            background: rgba(126, 83, 25, .17);
+            color: #f4d6a2;
+        }
+        .bp-source-status-live { border-color: rgba(69, 201, 154, .42); }
+        .bp-source-status-live .bp-source-dot { background: #45c99a; box-shadow: 0 0 11px rgba(69, 201, 154, .7); }
+        .bp-source-status-off { border-color: rgba(224, 168, 83, .42); }
+        .bp-source-dot { background: #e0a853; }
+        .bp-status-new { background: rgba(89, 184, 255, .1); color: #8bcaff; border-color: #3d83b6; }
+        .bp-status-threat { background: rgba(255, 107, 120, .12); color: #ff929b; border-color: #b8515d; }
+        .bp-status-false-pos { background: rgba(168, 182, 202, .1); color: #c0cad8; border-color: #66778e; }
+        .bp-status-investigating { background: rgba(244, 201, 107, .1); color: #f4cf7e; border-color: #ad8840; }
+        .bp-badge-critical { background: rgba(255, 107, 120, .13); color: #ff929b; border-color: #b8515d; }
+        .bp-badge-high { background: rgba(255, 159, 90, .13); color: #ffb47d; border-color: #b76b3d; }
+        .bp-badge-medium { background: rgba(244, 201, 107, .13); color: #f4cf7e; border-color: #ad8840; }
+        .bp-badge-low { background: rgba(69, 201, 154, .13); color: #72ddb3; border-color: #318d6f; }
+        a { color: var(--bp-blue); }
+        hr { border-color: rgba(101, 128, 161, .23); }
+        :focus-visible { outline: 2px solid var(--bp-blue) !important; outline-offset: 2px; }
+        button:disabled, [aria-disabled="true"] {
+            opacity: .58 !important;
+            cursor: not-allowed !important;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
         }
     </style>
     """

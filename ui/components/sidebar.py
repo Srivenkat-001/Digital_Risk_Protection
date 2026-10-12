@@ -39,10 +39,10 @@ def render_sidebar(brands: list[Brand]) -> str:
             role_badge = f'<span class="bp-badge bp-status-new">{escape(role.upper())}</span>'
             st.markdown(
                 f"""
-                <div style="background:#161b22; border:1px solid #30363d; border-radius:6px; padding:8px 12px; margin-bottom:14px;">
-                    <div style="font-size:0.85rem; font-weight:600; color:#f0f6fc;">{display_name}</div>
-                    <div style="font-size:0.75rem; color:#8b949e;">{email}</div>
-                    <div style="margin-top:6px;">{role_badge}</div>
+                <div class="bp-user-card">
+                    <div class="bp-user-name">{display_name}</div>
+                    <div class="bp-user-email">{email}</div>
+                    <div class="bp-user-role">{role_badge}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -86,7 +86,7 @@ def render_sidebar(brands: list[Brand]) -> str:
         if settings.DEMO_MODE_ENABLED:
             st.markdown(
                 """
-                <div style="background:#1c2128; border:1px solid #388bfd44; border-radius:6px; padding:8px 10px; font-size:0.75rem; color:#79c0ff;">
+                <div class="bp-demo-mode">
                     🧪 <strong>Demo Mode Active</strong><br>
                     Synthetic data included
                 </div>

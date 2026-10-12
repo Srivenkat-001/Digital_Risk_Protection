@@ -20,5 +20,5 @@ def test_status_chart_uses_supported_axis_tickfont(monkeypatch):
     render_status_bar({"New": 2, "Investigating": 1})
 
     assert len(figures) == 1
-    assert figures[0].layout.xaxis.tickfont.color == "#bdcbe0"
-    assert figures[0].layout.yaxis.tickfont.color == "#edf4ff"
+    assert figures[0].layout.xaxis.tickfont.color == "#b8c6d9"
+    assert figures[0].layout.yaxis.tickfont.color == "#f1f5fb"
