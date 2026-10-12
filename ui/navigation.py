@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from config.settings import settings as app_settings
 from services.auth import AuthService
 from services.brand_service import BrandService
+from ui.components.brand_mark import render_brand_mark
 from ui.components.sidebar import render_sidebar
 from ui.pages import (
     app_monitoring,
@@ -28,16 +29,7 @@ def render_login_view(db: Session):
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown(
-            """
-            <div style="text-align: center; margin-top: 50px; margin-bottom: 25px;">
-                <span style="font-size: 3.5rem;">👻</span>
-                <h1 style="color: #58a6ff; margin: 0; font-size: 2.2rem; font-weight: 800;">BrandPhantom</h1>
-                <p style="color: #8b949e; font-size: 1.0rem;">AI-Powered Digital Risk Protection Platform</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        render_brand_mark(centered=True)
 
         with st.container(border=True):
             st.markdown("### Secure Sign-In")

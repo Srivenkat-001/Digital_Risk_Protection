@@ -28,7 +28,10 @@ def render(db: Session, organization_id: str):
 
     st.markdown("## 🏢 Brand Profile Management")
     st.caption("Configure official corporate identities, verified assets, and approved digital presence.")
-    st.info("Included scan connectors return synthetic demo candidates only; no social network or app store is queried.")
+    st.info(
+        "Demo connectors provide labeled sample records. When enabled, public Bluesky profile search "
+        "and Apple App Store lookup can also collect live public metadata; other platforms are unavailable."
+    )
 
     tab_list, tab_create, tab_edit = st.tabs(
         ["📋 Registered Brands", "➕ Register New Brand", "✏️ Edit Brand Profile"]

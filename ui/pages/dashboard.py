@@ -21,7 +21,7 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     metrics = service.get_dashboard_summary(organization_id, brand_id)
 
     st.markdown("## 📊 Threat Intelligence & Monitoring Dashboard")
-    st.caption("Database-backed risk and triage overview. Included findings are synthetic demo records; live source collection is not implemented.")
+    st.caption("Database-backed risk and triage overview. Bluesky public-profile search and Apple App Store lookup are opt-in; sample records are labeled synthetic.")
 
     # Synthetic Demo Alert
     if metrics["is_synthetic_data_present"]:

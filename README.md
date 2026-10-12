@@ -16,6 +16,7 @@ BrandPhantom is a Streamlit demonstration of a digital-risk-protection workflow 
 - By default `DEMO_MODE_ENABLED=true`. A new, empty database is seeded with a synthetic NovaPay tenant and demo accounts. The seed workflow runs synthetic candidates through the real rule/scoring/database pipeline. These records are examples only—not verified threats or live platform observations.
 - In local demo mode, use the Admin, Analyst, or Viewer role-selection button on the sign-in screen. These passwordless shortcuts are disabled in production; seeded demo accounts receive random undisclosed password hashes.
 - Opt-in live sources: Bluesky public profile search uses the [public AppView API](https://docs.bsky.app/docs/api/app-bsky-actor-search-actors), and Apple App Store search uses Apple's [iTunes Search API](https://performance-partners.apple.com/search-api). Both are disabled by default and can be enabled with `LIVE_CONNECTORS_ENABLED=true`. Requests have timeouts, bounded response sizes, limited retries, and result caps. These public searches can be incomplete and do not provide real-time or private-account access.
+- **Live social-account search:** open **Social Monitoring**, select a brand, and click **Search live Bluesky profiles**. This runs the public Bluesky profile search without demo connectors, persists returned public profiles, and sends them through the detection and triage pipeline. It does not log in to accounts or search private data. The search is limited to Bluesky and may return incomplete results.
 - Twitter/X, Instagram, and Google Play remain unavailable adapter placeholders; their credentials do not enable collection. No external threat-intelligence or takedown access is claimed.
 - Detection is deterministic heuristic/fuzzy matching, not a trained AI/ML model. A similarity match or score is an indicator, not proof of fraud. Analyst verification is required.
 - Candidate URLs are displayed as plain text; the application does not visit suspicious URLs. Remote image fetching is disabled in the perceptual-hash helper; callers must provide trusted bytes or a local image.
@@ -50,11 +51,12 @@ flowchart LR
 
 ## Short demo walkthrough
 
-1. Start the app and choose the demo Admin role. Point out the synthetic-data banner and disabled live connectors.
+1. Start the app and choose the demo Admin role. Point out the synthetic-data banner; live connectors are disabled until explicitly enabled.
 2. In **Brands**, inspect the seeded NovaPay official social account and app listing. Register a sample brand to demonstrate aliases, verified assets, and optional logo-image hashing.
 3. Run a scan. The built-in connectors generate clearly labeled synthetic examples; the scan applies the same normalization, verified-asset exclusions, scoring, evidence, and persistence pipeline used by the prototype.
 4. Open **Social Monitoring** and **Mobile App Monitoring**. Compare the synthetic look-alike candidates and show that configured official accounts/apps are excluded. Emphasize that similarity is a heuristic signal, not proof.
-5. Open a finding, inspect its factor-by-factor explanation, update its review status, open an investigation, then visit **Scan History** and **Reports & Exports**.
+5. Optionally enable live connectors and run **Search live Bluesky profiles** from **Social Monitoring**. This searches actual public profiles; keep these results distinct from synthetic sample records.
+6. Open a finding, inspect its factor-by-factor explanation, update its review status, open an investigation, then visit **Scan History** and **Reports & Exports**.
 
 For a live presentation, use only the demo database and do not imply that any displayed candidate was collected from a real platform.
 

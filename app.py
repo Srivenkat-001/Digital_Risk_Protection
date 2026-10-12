@@ -16,7 +16,7 @@ from ui.theme import apply_theme
 # Page configuration
 st.set_page_config(
     page_title=f"{settings.APP_NAME} | Digital Risk Protection",
-    page_icon="👻",
+    page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded",
 )

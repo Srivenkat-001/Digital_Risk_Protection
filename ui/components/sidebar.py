@@ -9,6 +9,7 @@ import streamlit as st
 
 from config.settings import settings
 from db.models.brand import Brand
+from ui.components.brand_mark import render_brand_mark
 
 PAGES = [
     ("Dashboard", "📊"),
@@ -25,18 +26,7 @@ PAGES = [
 def render_sidebar(brands: list[Brand]) -> str:
     """Renders the left navigation bar and returns the selected page."""
     with st.sidebar:
-        st.markdown(
-            """
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom: 16px;">
-                <span style="font-size: 1.8rem;">👻</span>
-                <div>
-                    <h2 style="margin:0; font-size: 1.3rem; color: #58a6ff; font-weight:800; letter-spacing: -0.02em;">BrandPhantom</h2>
-                    <span style="font-size: 0.72rem; color: #8b949e; text-transform: uppercase; letter-spacing: 0.08em;">Digital Risk Protection</span>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        render_brand_mark(compact=True)
 
         user = st.session_state.get("user")
         role = st.session_state.get("role", "viewer")

@@ -9,8 +9,11 @@ import streamlit as st
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from config.settings import settings
 from db.models.candidate import CandidateProfile
+from jobs.scan_runner import run_brand_scan
 from services.auth import AuthService
+from services.brand_service import BrandService
 from services.finding_service import FindingService
 from ui.components.evidence_panel import render_evidence_panel
 from ui.components.risk_badges import render_risk_badge, render_status_badge
@@ -19,18 +22,82 @@ from ui.components.risk_badges import render_risk_badge, render_status_badge
 def render(db: Session, organization_id: str, brand_id: str | None = None):
     finding_service = FindingService(db)
     can_triage = AuthService.is_authorized(st.session_state.get("role", "viewer"), "analyst")
+    can_scan = AuthService.is_authorized(st.session_state.get("role", "viewer"), "analyst")
 
     st.markdown("## 🌐 Social Media Threat Monitoring")
-    st.caption("Review observed profiles. Bluesky public search is opt-in; demo connector records are explicitly marked synthetic.")
+    st.caption("Run on-demand searches of public Bluesky profiles, then review persisted observations and explainable risk signals.")
+
+    live_enabled = settings.LIVE_CONNECTORS_ENABLED
+    st.markdown(
+        f'<div class="bp-source-status {"bp-source-status-live" if live_enabled else "bp-source-status-off"}">'
+        f'<span class="bp-source-dot"></span><strong>Bluesky live search {"enabled" if live_enabled else "disabled"}</strong>'
+        '<span>Public profiles only · no login · results are not comprehensive</span></div>',
+        unsafe_allow_html=True,
+    )
+    if not live_enabled:
+        st.info(
+            "To enable real Bluesky searches, set `LIVE_CONNECTORS_ENABLED=true` in your local `.env` "
+            "or Streamlit Cloud App settings → Secrets, then restart/reboot the app. "
+            "This public search does not require an API key."
+        )
+
+    brands = BrandService(db).list_brands(organization_id)
+    eligible_brands = [brand for brand in brands if brand_id is None or brand.id == brand_id]
+    selected_brand_id = None
+    if not eligible_brands:
+        st.info("Register an active brand before searching for related public profiles.")
+    elif not can_scan:
+        st.warning("Analyst or Administrator access is required to run a live search.")
+    else:
+        if len(eligible_brands) == 1:
+            selected_brand = eligible_brands[0]
+            selected_brand_id = selected_brand.id
+            st.markdown(f"**Search target:** {selected_brand.name}")
+        else:
+            brand_options = {brand.name: brand.id for brand in eligible_brands}
+            selected_name = st.selectbox("Brand to search", list(brand_options))
+            selected_brand_id = brand_options[selected_name]
+
+        if st.button(
+            "Search live Bluesky profiles",
+            type="primary",
+            disabled=not live_enabled or not selected_brand_id,
+            help="Queries Bluesky's public profile-search API and stores real results separately from demo records.",
+        ):
+            with st.spinner("Searching public Bluesky profiles and evaluating results..."):
+                scan = run_brand_scan(
+                    db=db,
+                    brand_id=selected_brand_id,
+                    organization_id=organization_id,
+                    triggered_by_user_id=(
+                        st.session_state["user"].id if st.session_state.get("user") else None
+                    ),
+                    source_types=["social"],
+                    include_demo_sources=False,
+                )
+            if scan.status == "failed":
+                st.error(f"Live search failed: {scan.error_message or 'No details were provided.'}")
+            elif scan.status == "partial":
+                st.warning(
+                    f"Search completed with a source error. {scan.total_candidates_found} live profiles "
+                    f"were collected. Details: {scan.error_message}"
+                )
+            else:
+                st.success(
+                    f"Live Bluesky search complete: {scan.total_candidates_found} public profiles found, "
+                    f"{scan.new_findings_count} new findings, {scan.excluded_assets_count} verified official accounts excluded."
+                )
 
     # Platform & Search Filter Row
-    f_col1, f_col2, f_col3 = st.columns([2, 2, 2])
+    f_col1, f_col2, f_col3, f_col4 = st.columns([2, 2, 2, 2])
     with f_col1:
         platform_filter = st.selectbox("Platform Filter", ["All Platforms", "Bluesky", "Twitter/X", "Instagram", "Facebook", "Telegram"])
     with f_col2:
         view_mode = st.radio("Display View", ["Suspicious Candidates (Findings)", "Official Excluded Accounts", "All Discovered Records"], horizontal=True)
     with f_col3:
         search_query = st.text_input("🔍 Search Handle or Name", placeholder="e.g. NovaPay_Help")
+    with f_col4:
+        source_filter = st.selectbox("Record Source", ["All records", "Live only", "Synthetic demo only"])
 
     # Fetch candidates based on filters
     stmt = select(CandidateProfile).where(CandidateProfile.organization_id == organization_id)
@@ -49,7 +116,11 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     # Apply text filter if provided
     if search_query:
         sq = search_query.lower().strip()
-        candidates = [c for c in candidates if sq in c.username.lower() or sq in c.display_name.lower()]
+        candidates = [c for c in candidates if sq in (c.username or "").lower() or sq in (c.display_name or "").lower()]
+    if source_filter == "Live only":
+        candidates = [candidate for candidate in candidates if not candidate.is_synthetic]
+    elif source_filter == "Synthetic demo only":
+        candidates = [candidate for candidate in candidates if candidate.is_synthetic]
 
     st.markdown(f"**Showing {len(candidates)} social profile records**")
 

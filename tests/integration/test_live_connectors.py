@@ -244,6 +244,48 @@ def test_public_connector_results_persist_through_scan(
     assert "Apple iTunes Search API" in app_candidate.raw_metadata
 
 
+def test_social_live_only_scan_does_not_add_synthetic_profiles(
+    db_session, test_org, test_brand, test_users, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "LIVE_CONNECTORS_ENABLED", True)
+
+    def fake_get(url, params, **kwargs):
+        return _response(
+            {
+                "actors": [
+                    {
+                        "did": "did:plc:liveonly",
+                        "handle": "novapay-live.example",
+                        "displayName": "NovaPay Live",
+                        "description": "Public profile",
+                        "followersCount": 4,
+                    }
+                ]
+            }
+        )
+
+    monkeypatch.setattr("connectors.http_json.requests.get", fake_get)
+    job = run_brand_scan(
+        db_session,
+        test_brand.id,
+        test_org.id,
+        test_users["admin"].id,
+        source_types=["social"],
+        include_demo_sources=False,
+    )
+    profiles = list(
+        db_session.scalars(
+            select(CandidateProfile).where(CandidateProfile.organization_id == test_org.id)
+        ).all()
+    )
+
+    assert job.status == "completed"
+    assert job.total_candidates_found == 1
+    assert len(profiles) == 1
+    assert profiles[0].platform == "Bluesky"
+    assert profiles[0].is_synthetic is False
+
+
 def test_live_app_observation_replaces_demo_source_label(
     db_session, test_org, test_brand
 ) -> None:
