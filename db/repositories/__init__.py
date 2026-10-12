@@ -1,21 +1,21 @@
-"""
-Repositories package exports.
-"""
+"""Lazy repository exports to keep package imports side-effect free."""
 
-from db.repositories.audit_repo import AuditRepository
-from db.repositories.brand_repo import BrandRepository
-from db.repositories.candidate_repo import CandidateRepository
-from db.repositories.finding_repo import FindingRepository
-from db.repositories.investigation_repo import InvestigationRepository
-from db.repositories.scan_repo import ScanRepository
-from db.repositories.user_repo import UserRepository
+from importlib import import_module
 
-__all__ = [
-    "AuditRepository",
-    "BrandRepository",
-    "CandidateRepository",
-    "FindingRepository",
-    "InvestigationRepository",
-    "ScanRepository",
-    "UserRepository",
-]
+_EXPORTS = {
+    "AuditRepository": "db.repositories.audit_repo",
+    "BrandRepository": "db.repositories.brand_repo",
+    "CandidateRepository": "db.repositories.candidate_repo",
+    "FindingRepository": "db.repositories.finding_repo",
+    "InvestigationRepository": "db.repositories.investigation_repo",
+    "ScanRepository": "db.repositories.scan_repo",
+    "UserRepository": "db.repositories.user_repo",
+}
+__all__ = list(_EXPORTS)
+
+
+def __getattr__(name: str):
+    module_name = _EXPORTS.get(name)
+    if module_name is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    return getattr(import_module(module_name), name)

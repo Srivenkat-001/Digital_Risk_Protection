@@ -1,21 +1,22 @@
-"""
-Services package exports.
-"""
+"""Lazy service exports to avoid importing the entire application on package load."""
 
-from services.audit_service import AuditService
-from services.auth import AuthService, hash_password, verify_password
-from services.brand_service import BrandService
-from services.case_service import CaseService
-from services.dashboard_service import DashboardService
-from services.finding_service import FindingService
+from importlib import import_module
 
-__all__ = [
-    "AuditService",
-    "AuthService",
-    "BrandService",
-    "CaseService",
-    "DashboardService",
-    "FindingService",
-    "hash_password",
-    "verify_password",
-]
+_EXPORTS = {
+    "AuditService": "services.audit_service",
+    "AuthService": "services.auth",
+    "BrandService": "services.brand_service",
+    "CaseService": "services.case_service",
+    "DashboardService": "services.dashboard_service",
+    "FindingService": "services.finding_service",
+    "hash_password": "services.auth",
+    "verify_password": "services.auth",
+}
+__all__ = list(_EXPORTS)
+
+
+def __getattr__(name: str):
+    module_name = _EXPORTS.get(name)
+    if module_name is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    return getattr(import_module(module_name), name)

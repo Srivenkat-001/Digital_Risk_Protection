@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from config.logging_config import logger
 from config.settings import settings
 from db.base import Base
+from db.models import load_models
 
 # Engine configuration
 connect_args = {}
@@ -28,6 +29,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expi
 def init_db():
     """Create all database tables."""
     logger.info("Initializing database schema...")
+    load_models()
     Base.metadata.create_all(bind=engine)
     logger.info("Database schema initialized successfully.")
 
