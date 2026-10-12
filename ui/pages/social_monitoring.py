@@ -25,7 +25,10 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     can_scan = AuthService.is_authorized(st.session_state.get("role", "viewer"), "analyst")
 
     st.markdown("## 🌐 Social Media Threat Monitoring")
-    st.caption("Run on-demand searches of public Bluesky profiles, then review persisted observations and explainable risk signals.")
+    st.caption(
+        "Run on-demand searches of public Bluesky profiles and review clearly labeled synthetic examples "
+        "for additional social platforms."
+    )
 
     live_enabled = settings.LIVE_CONNECTORS_ENABLED
     st.markdown(
@@ -47,7 +50,7 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     if not eligible_brands:
         st.info("Register an active brand before searching for related public profiles.")
     elif not can_scan:
-        st.warning("Analyst or Administrator access is required to run a live search.")
+        st.warning("Analyst or Administrator access is required to run searches or generate sample profiles.")
     else:
         if len(eligible_brands) == 1:
             selected_brand = eligible_brands[0]
@@ -58,46 +61,86 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
             selected_name = st.selectbox("Brand to search", list(brand_options))
             selected_brand_id = brand_options[selected_name]
 
-        if st.button(
-            "Search live Bluesky profiles",
-            type="primary",
-            disabled=not live_enabled or not selected_brand_id,
-            help="Queries Bluesky's public profile-search API and stores real results separately from demo records.",
-        ):
-            with st.spinner("Searching public Bluesky profiles and evaluating results..."):
-                scan = run_brand_scan(
-                    db=db,
-                    brand_id=selected_brand_id,
-                    organization_id=organization_id,
-                    triggered_by_user_id=(
-                        st.session_state["user"].id if st.session_state.get("user") else None
-                    ),
-                    source_types=["social"],
-                    include_demo_sources=False,
-                )
-            if scan.status == "failed":
-                st.error(f"Live search failed: {scan.error_message or 'No details were provided.'}")
-            elif scan.status == "partial":
-                st.warning(
-                    f"Search completed with a source error. {scan.total_candidates_found} live profiles "
-                    f"were collected. Details: {scan.error_message}"
-                )
-            else:
-                st.success(
-                    f"Live Bluesky search complete: {scan.total_candidates_found} public profiles found, "
-                    f"{scan.new_findings_count} new findings, {scan.excluded_assets_count} verified official accounts excluded."
-                )
+        live_col, demo_col = st.columns(2)
+        with live_col:
+            if st.button(
+                "Search live Bluesky profiles",
+                type="primary",
+                disabled=not live_enabled or not selected_brand_id,
+                help="Queries Bluesky's public profile-search API and stores real results separately from demo records.",
+            ):
+                with st.spinner("Searching public Bluesky profiles and evaluating results..."):
+                    scan = run_brand_scan(
+                        db=db,
+                        brand_id=selected_brand_id,
+                        organization_id=organization_id,
+                        triggered_by_user_id=(
+                            st.session_state["user"].id if st.session_state.get("user") else None
+                        ),
+                        source_types=["social"],
+                        include_demo_sources=False,
+                    )
+                if scan.status == "failed":
+                    st.error(f"Live search failed: {scan.error_message or 'No details were provided.'}")
+                elif scan.status == "partial":
+                    st.warning(
+                        f"Search completed with a source error. {scan.total_candidates_found} live profiles "
+                        f"were collected. Details: {scan.error_message}"
+                    )
+                else:
+                    st.success(
+                        f"Live Bluesky search complete: {scan.total_candidates_found} public profiles found, "
+                        f"{scan.new_findings_count} new findings, {scan.excluded_assets_count} verified official accounts excluded."
+                    )
+        with demo_col:
+            if st.button(
+                "Generate sample profiles for all platforms",
+                disabled=not settings.DEMO_MODE_ENABLED or not selected_brand_id,
+                help="Creates clearly labeled synthetic examples for Bluesky, X, Instagram, Facebook, TikTok, LinkedIn, and Telegram. No external service is queried.",
+            ):
+                with st.spinner("Creating clearly labeled sample profiles..."):
+                    scan = run_brand_scan(
+                        db=db,
+                        brand_id=selected_brand_id,
+                        organization_id=organization_id,
+                        triggered_by_user_id=(
+                            st.session_state["user"].id if st.session_state.get("user") else None
+                        ),
+                        source_types=["social"],
+                        include_live_sources=False,
+                    )
+                if scan.status == "failed":
+                    st.error(f"Sample generation failed: {scan.error_message or 'No details were provided.'}")
+                else:
+                    st.session_state["social_view_mode"] = "All Discovered Records"
+                    st.session_state["social_source_filter"] = "Synthetic demo only"
+                    st.success(
+                        f"Synthetic samples ready: {scan.total_candidates_found} example profiles across "
+                        "seven platforms. These are not real accounts."
+                    )
 
     # Platform & Search Filter Row
     f_col1, f_col2, f_col3, f_col4 = st.columns([2, 2, 2, 2])
     with f_col1:
-        platform_filter = st.selectbox("Platform Filter", ["All Platforms", "Bluesky", "Twitter/X", "Instagram", "Facebook", "Telegram"])
+        platform_filter = st.selectbox(
+            "Platform Filter",
+            ["All Platforms", "Bluesky", "Twitter/X", "Instagram", "Facebook", "TikTok", "LinkedIn", "Telegram"],
+        )
     with f_col2:
-        view_mode = st.radio("Display View", ["Suspicious Candidates (Findings)", "Official Excluded Accounts", "All Discovered Records"], horizontal=True)
+        view_mode = st.radio(
+            "Display View",
+            ["Suspicious Candidates (Findings)", "Official Excluded Accounts", "All Discovered Records"],
+            horizontal=True,
+            key="social_view_mode",
+        )
     with f_col3:
         search_query = st.text_input("🔍 Search Handle or Name", placeholder="e.g. NovaPay_Help")
     with f_col4:
-        source_filter = st.selectbox("Record Source", ["All records", "Live only", "Synthetic demo only"])
+        source_filter = st.selectbox(
+            "Record Source",
+            ["All records", "Live only", "Synthetic demo only"],
+            key="social_source_filter",
+        )
 
     # Fetch candidates based on filters
     stmt = select(CandidateProfile).where(CandidateProfile.organization_id == organization_id)
@@ -143,7 +186,9 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
                 st.code(c.profile_url, language=None)
                 st.caption(f"First Observed: {c.first_observed_at.strftime('%Y-%m-%d %H:%M')} | Last Observed: {c.last_observed_at.strftime('%Y-%m-%d %H:%M')}")
                 if c.is_synthetic:
-                    st.caption("🧪 *Synthetic Demo Record*")
+                    st.caption(
+                        "🧪 Synthetic demo example — not a real account and not collected from this platform."
+                    )
                 elif c.platform == "Bluesky":
                     st.caption("Live public profile metadata from the Bluesky AppView API.")
 

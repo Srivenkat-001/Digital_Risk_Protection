@@ -19,7 +19,7 @@ class DemoSocialConnector(BaseSocialConnector):
 
     @property
     def platform_or_store(self) -> str:
-        return "Twitter/X"
+        return "Multiple social platforms (synthetic)"
 
     @property
     def is_demo(self) -> bool:
@@ -39,59 +39,90 @@ class DemoSocialConnector(BaseSocialConnector):
             brand_handle += "1"
         logo_hash = brand.logos[0].perceptual_hash if (brand.logos and brand.logos[0].perceptual_hash) else "a1b2c3d4e5f60000"
 
-        # Deterministic candidates modeled on NovaPay threats
-        candidates = [
-            # 1. Verified official profile (Will be excluded by exclusion engine)
-            {
-                "platform": "Twitter/X",
-                "profile_url": f"https://twitter.com/{brand_clean}Official",
-                "platform_account_id": f"tw-{brand_clean.lower()}-official-001",
-                "username": f"{brand_clean}Official",
-                "display_name": f"{brand.name} Official",
-                "bio": f"Official verified presence of {brand.name}. {brand.description or 'Secure payments and customer transactions.'}",
-                "avatar_url": "https://example.com/assets/novapay_logo.png",
-                "avatar_hash": logo_hash,
-                "follower_count": 85400,
-                "is_synthetic": True,
-            },
-            # 2. Fake Support Look-alike Profile (High Risk)
-            {
-                "platform": "Twitter/X",
-                "profile_url": f"https://twitter.com/{brand_clean}_Help",
-                "platform_account_id": "tw-synthetic-fake-002",
-                "username": f"{brand_clean}_Help",
-                "display_name": f"{brand.name} Customer Care Desk",
-                "bio": f"24/7 Official Customer Support for {brand.name}. Having account issues? DM us or contact our resolution desk to unlock your wallet.",
-                "avatar_url": "https://example.com/assets/fake_support.png",
-                "avatar_hash": logo_hash,  # Identical logo hash
-                "follower_count": 210,
-                "is_synthetic": True,
-            },
-            # 3. Phishing / Leetspeak Profile (Critical Risk)
-            {
-                "platform": "Twitter/X",
-                "profile_url": f"https://twitter.com/{brand_handle}",
-                "platform_account_id": f"tw-synthetic-lookalike-{brand_clean.lower()}-003",
-                "username": brand_handle,
-                "display_name": f"{brand.name} Rewards & Bonus",
-                "bio": f"Limited {brand.name} reward! Verify your account and wallet connect below to claim a free bonus.",
-                "avatar_url": "https://example.com/assets/phishing_avatar.png",
-                "avatar_hash": logo_hash,
-                "follower_count": 1240,
-                "is_synthetic": True,
-            },
-            # 4. Legitimate Unrelated Organization (Low Risk)
-            {
-                "platform": "Twitter/X",
-                "profile_url": "https://twitter.com/novapayne_photo",
-                "platform_account_id": "tw-synthetic-unrelated-004",
-                "username": "novapayne_photo",
-                "display_name": "Nova Payne Photography",
-                "bio": "Professional wedding and portrait photographer based in Seattle, WA. Portfolio inquiries welcome.",
-                "avatar_url": "https://example.com/assets/photo_avatar.png",
-                "avatar_hash": "ffff0000aaaa5555",
-                "follower_count": 3400,
-                "is_synthetic": True,
-            },
-        ]
+        platforms = (
+            ("Twitter/X", "twitter-x"),
+            ("Instagram", "instagram"),
+            ("Facebook", "facebook"),
+            ("TikTok", "tiktok"),
+            ("LinkedIn", "linkedin"),
+            ("Telegram", "telegram"),
+            ("Bluesky", "bluesky"),
+        )
+        candidates = []
+        for platform, slug in platforms:
+            examples = []
+            if platform == "Twitter/X":
+                examples.append(
+                    {
+                        "username": f"{brand_clean}Official",
+                        "display_name": f"{brand.name} Official",
+                        "bio": (
+                            f"Official verified presence of {brand.name}. "
+                            f"{brand.description or 'Secure payments and customer transactions.'}"
+                        ),
+                        "avatar_hash": logo_hash,
+                        "follower_count": 85400,
+                        "kind": "official-example",
+                    }
+                )
+
+            examples.extend(
+                [
+                    {
+                        "username": f"{brand_clean}_Help",
+                        "display_name": f"{brand.name} Customer Care Desk",
+                        "bio": (
+                            f"24/7 Official Customer Support for {brand.name}. Having account issues? "
+                            "DM us or contact our resolution desk to unlock your wallet."
+                        ),
+                        "avatar_hash": logo_hash,
+                        "follower_count": 210,
+                        "kind": "support-lookalike",
+                    },
+                    {
+                        "username": brand_handle,
+                        "display_name": f"{brand.name} Rewards & Bonus",
+                        "bio": (
+                            f"Limited {brand.name} reward! Verify your account and wallet connect below "
+                            "to claim a free bonus."
+                        ),
+                        "avatar_hash": logo_hash,
+                        "follower_count": 1240,
+                        "kind": "lookalike",
+                    },
+                    {
+                        "username": f"{brand_clean}_community",
+                        "display_name": "Nova Payne Photography",
+                        "bio": (
+                            "Professional wedding and portrait photographer. "
+                            "Portfolio inquiries welcome."
+                        ),
+                        "avatar_hash": "ffff0000aaaa5555",
+                        "follower_count": 3400,
+                        "kind": "unrelated",
+                    },
+                ]
+            )
+
+            for example in examples:
+                username = example["username"]
+                kind = example["kind"]
+                candidates.append(
+                    {
+                        "platform": platform,
+                        "profile_url": f"https://example.com/demo/{slug}/{username}",
+                        "platform_account_id": f"demo-{slug}-{brand_clean.lower()}-{kind}",
+                        "username": username,
+                        "display_name": example["display_name"],
+                        "bio": example["bio"],
+                        "avatar_url": None,
+                        "avatar_hash": example["avatar_hash"],
+                        "follower_count": example["follower_count"],
+                        "raw_metadata": {
+                            "source": "BrandPhantom synthetic demo generator",
+                            "limitation": "Example profile only; this account was not found on the platform.",
+                        },
+                        "is_synthetic": True,
+                    }
+                )
         return candidates

@@ -14,6 +14,24 @@ from jobs.scan_runner import run_brand_scan
 from services.finding_service import FindingService
 
 
+def test_demo_social_connector_has_labeled_examples_for_supported_platforms(test_brand):
+    candidates = DemoSocialConnector().collect_candidates(test_brand)
+    platforms = {candidate["platform"] for candidate in candidates}
+
+    assert platforms == {
+        "Twitter/X",
+        "Instagram",
+        "Facebook",
+        "TikTok",
+        "LinkedIn",
+        "Telegram",
+        "Bluesky",
+    }
+    assert all(candidate["is_synthetic"] for candidate in candidates)
+    assert all(candidate["profile_url"].startswith("https://example.com/demo/") for candidate in candidates)
+    assert all(candidate["raw_metadata"]["source"] == "BrandPhantom synthetic demo generator" for candidate in candidates)
+
+
 def test_full_scan_pipeline_execution(db_session: Session, test_org, test_brand, test_users):
     scan_job = run_brand_scan(
         db=db_session,
@@ -22,9 +40,9 @@ def test_full_scan_pipeline_execution(db_session: Session, test_org, test_brand,
         triggered_by_user_id=test_users["admin"].id,
     )
     assert scan_job.status in ("completed", "partial")
-    assert scan_job.total_candidates_found == 8
+    assert scan_job.total_candidates_found == 26
     assert scan_job.excluded_assets_count == 2  # 1 official social account + 1 official app listing
-    assert scan_job.new_findings_count == 6
+    assert scan_job.new_findings_count == 24
 
     # 1. Verify Official Twitter Asset is excluded
     stmt_soc = select(CandidateProfile).where(
@@ -72,6 +90,28 @@ def test_full_scan_pipeline_execution(db_session: Session, test_org, test_brand,
     assert finding_fake.assessment is not None
     assert len(finding_fake.evidence_items) > 0
 
+
+def test_demo_only_scan_creates_examples_without_live_sources(
+    db_session: Session, test_org, test_brand, test_users
+):
+    scan_job = run_brand_scan(
+        db=db_session,
+        brand_id=test_brand.id,
+        organization_id=test_org.id,
+        triggered_by_user_id=test_users["admin"].id,
+        source_types=["social"],
+        include_live_sources=False,
+    )
+    profiles = db_session.scalars(
+        select(CandidateProfile).where(CandidateProfile.brand_id == test_brand.id)
+    ).all()
+
+    assert scan_job.status == "completed"
+    assert scan_job.total_candidates_found == 22
+    assert len(profiles) == 22
+    assert all(profile.is_synthetic for profile in profiles)
+
+
 def test_scan_deduplication(db_session: Session, test_org, test_brand, test_users):
     # Run scan twice
     run_brand_scan(
@@ -90,9 +130,9 @@ def test_scan_deduplication(db_session: Session, test_org, test_brand, test_user
     # Second scan should observe existing candidates, but create 0 new findings
     assert second_job.new_findings_count == 0
 
-    # Total candidate profiles should still be 4
+    # The demo produces 22 synthetic social examples across seven platforms.
     total_profiles = db_session.query(CandidateProfile).count()
-    assert total_profiles == 4
+    assert total_profiles == 22
 
 
 def test_finding_status_rejects_unknown_values(db_session: Session, test_org, test_brand, test_users):

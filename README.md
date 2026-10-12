@@ -9,7 +9,7 @@ BrandPhantom is a Streamlit demonstration of a digital-risk-protection workflow 
 - Deterministic fuzzy name/handle/text analysis, suspicious-affix and scam-language indicators, package/publisher checks, and perceptual-hash comparison.
 - Signal-level explanations and evidence limitations; missing data is not treated as malicious evidence.
 - SQLite by default, SQLAlchemy persistence, and Alembic configuration.
-- Demo connectors produce synthetic candidate profiles/listings, explicitly labelled in the UI and database.
+- Demo connectors produce synthetic candidate profiles/listings, explicitly labelled in the UI and database. The social demo includes examples for Bluesky, X, Instagram, Facebook, TikTok, LinkedIn, and Telegram; these are not collected platform accounts.
 
 ## Demo mode and important limitations
 
@@ -17,6 +17,7 @@ BrandPhantom is a Streamlit demonstration of a digital-risk-protection workflow 
 - In local demo mode, use the Admin, Analyst, or Viewer role-selection button on the sign-in screen. These passwordless shortcuts are disabled in production; seeded demo accounts receive random undisclosed password hashes.
 - Opt-in live sources: Bluesky public profile search uses the [public AppView API](https://docs.bsky.app/docs/api/app-bsky-actor-search-actors), and Apple App Store search uses Apple's [iTunes Search API](https://performance-partners.apple.com/search-api). Both are disabled by default and can be enabled with `LIVE_CONNECTORS_ENABLED=true`. Requests have timeouts, bounded response sizes, limited retries, and result caps. These public searches can be incomplete and do not provide real-time or private-account access.
 - **Live social-account search:** open **Social Monitoring**, select a brand, and click **Search live Bluesky profiles**. This runs the public Bluesky profile search without demo connectors, persists returned public profiles, and sends them through the detection and triage pipeline. It does not log in to accounts or search private data. The search is limited to Bluesky and may return incomplete results.
+- The other social platforms currently show labeled synthetic demonstration examples only. Those examples use reserved `example.com` URLs so they cannot be mistaken for real profiles.
 - Twitter/X, Instagram, and Google Play remain unavailable adapter placeholders; their credentials do not enable collection. No external threat-intelligence or takedown access is claimed.
 - Detection is deterministic heuristic/fuzzy matching, not a trained AI/ML model. A similarity match or score is an indicator, not proof of fraud. Analyst verification is required.
 - Candidate URLs are displayed as plain text; the application does not visit suspicious URLs. Remote image fetching is disabled in the perceptual-hash helper; callers must provide trusted bytes or a local image.
@@ -57,6 +58,8 @@ flowchart LR
 4. Open **Social Monitoring** and **Mobile App Monitoring**. Compare the synthetic look-alike candidates and show that configured official accounts/apps are excluded. Emphasize that similarity is a heuristic signal, not proof.
 5. Optionally enable live connectors and run **Search live Bluesky profiles** from **Social Monitoring**. This searches actual public profiles; keep these results distinct from synthetic sample records.
 6. Open a finding, inspect its factor-by-factor explanation, update its review status, open an investigation, then visit **Scan History** and **Reports & Exports**.
+
+In **Social Monitoring**, analysts can also use **Generate sample profiles for all platforms** to create clearly marked synthetic examples for Bluesky, X, Instagram, Facebook, TikTok, LinkedIn, and Telegram. This action makes no external requests; only Bluesky currently has a live social-search integration.
 
 For a live presentation, use only the demo database and do not imply that any displayed candidate was collected from a real platform.
 

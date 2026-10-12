@@ -247,6 +247,80 @@ def apply_theme():
             border-color: var(--bp-border);
             border-radius: 9px;
         }
+        [data-testid="stTextInputField"],
+        [data-testid="stTextInputField"] input,
+        [data-testid="stTextArea"] textarea,
+        [data-testid="stNumberInput"] input,
+        [data-testid="stDateInput"] input,
+        [data-testid="stTimeInput"] input,
+        [data-testid="stSelectbox"] input {
+            background-color: #172338 !important;
+            color: #f4f8ff !important;
+            -webkit-text-fill-color: #f4f8ff !important;
+            caret-color: #f4f8ff !important;
+            border-color: #7890ad !important;
+            border-radius: 9px !important;
+            opacity: 1 !important;
+        }
+        [data-testid="stTextInputField"]::placeholder,
+        [data-testid="stTextInputField"] input::placeholder,
+        [data-testid="stTextArea"] textarea::placeholder,
+        [data-testid="stNumberInput"] input::placeholder {
+            color: #c1cde0 !important;
+            -webkit-text-fill-color: #c1cde0 !important;
+            opacity: 1 !important;
+        }
+        [data-testid="stTextInputField"] [data-baseweb="input"] > div,
+        [data-testid="stTextArea"] [data-baseweb="textarea"],
+        [data-testid="stNumberInput"] [data-baseweb="input"] > div,
+        [data-testid="stSelectbox"] [data-baseweb="select"] > div {
+            background-color: #172338 !important;
+            color: #f4f8ff !important;
+            border-color: #7890ad !important;
+            border-radius: 9px !important;
+        }
+        [data-testid="stSelectbox"] [role="combobox"] *,
+        [data-testid="stMultiSelect"] [role="combobox"] *,
+        [data-testid="stSelectbox"] [role="combobox"],
+        [data-testid="stMultiSelect"] [role="combobox"] {
+            color: #f4f8ff !important;
+        }
+        [role="listbox"] *, [role="option"] {
+            color: #172338 !important;
+        }
+        [data-testid="stWidgetLabel"] *,
+        [data-testid="stCheckbox"] label,
+        [data-testid="stRadioOption"] label,
+        [data-testid="stRadioOption"] p {
+            color: #eaf2ff !important;
+        }
+        [data-testid="stVerticalBlockBorderWrapper"] p,
+        [data-testid="stVerticalBlockBorderWrapper"] label,
+        [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stCaptionContainer"],
+        [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stText"] {
+            color: #dce8f7 !important;
+        }
+        [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMetricValue"] {
+            color: #f7faff !important;
+        }
+        [data-testid="stVerticalBlockBorderWrapper"] code,
+        [data-testid="stCode"] {
+            color: #eaf2ff !important;
+        }
+        [data-testid="stVerticalBlockBorderWrapper"] pre {
+            background-color: #0b1321 !important;
+            border: 1px solid #344660;
+        }
+        [data-testid="stAlert"] p,
+        [data-testid="stAlert"] [data-testid="stMarkdownContainer"] {
+            color: #f0f5ff !important;
+        }
+        [data-testid="stTabs"] button[role="tab"] {
+            color: #cfdaeb !important;
+        }
+        [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+            color: #72e4df !important;
+        }
         a { color: var(--bp-teal); }
         @media (max-width: 700px) {
             .bp-source-status > span:last-child { margin-left: 18px; }

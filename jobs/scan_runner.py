@@ -33,6 +33,7 @@ def run_brand_scan(
     triggered_by_user_id: str | None = None,
     source_types: list[str] | None = None,
     include_demo_sources: bool = True,
+    include_live_sources: bool = True,
 ) -> ScanJob:
     """
     Executes a complete monitoring scan for a brand across configured sources.
@@ -70,6 +71,8 @@ def run_brand_scan(
         active_connectors = [c for c in connectors if c.source_type in source_types]
         if not include_demo_sources:
             active_connectors = [c for c in active_connectors if not c.is_demo]
+        if not include_live_sources:
+            active_connectors = [c for c in active_connectors if c.is_demo]
 
         if not active_connectors:
             logger.warning("No active connectors found for selected source types.")

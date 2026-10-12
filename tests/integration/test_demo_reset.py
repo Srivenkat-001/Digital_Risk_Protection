@@ -18,7 +18,7 @@ def test_demo_seed_and_reset(db_session: Session):
 
     # Check findings
     findings = db_session.query(Finding).filter(Finding.organization_id == org.id).all()
-    assert len(findings) == 6
+    assert len(findings) == 24
 
     # 2. Reset demo data safely
     success = reset_demo_data(db_session, org.id)
@@ -26,4 +26,4 @@ def test_demo_seed_and_reset(db_session: Session):
 
     # Re-verify that records exist and are consistent after reset
     reset_findings = db_session.query(Finding).filter(Finding.organization_id == org.id).all()
-    assert len(reset_findings) == 6
+    assert len(reset_findings) == 24
