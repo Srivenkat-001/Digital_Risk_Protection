@@ -97,6 +97,7 @@ def run_brand_scan(
                             avatar_url=raw.get("avatar_url"),
                             avatar_hash=raw.get("avatar_hash"),
                             follower_count=raw.get("follower_count", 0),
+                            raw_metadata=raw.get("raw_metadata"),
                             is_synthetic=raw.get("is_synthetic", False),
                         )
                         candidate_repo.record_observation(scan_job.id, "social", candidate.id)
@@ -200,6 +201,7 @@ def run_brand_scan(
                             icon_hash=raw.get("icon_hash"),
                             version=raw.get("version"),
                             rating=raw.get("rating"),
+                            raw_metadata=raw.get("raw_metadata"),
                             is_synthetic=raw.get("is_synthetic", False),
                         )
                         candidate_repo.record_observation(scan_job.id, "app", candidate.id)

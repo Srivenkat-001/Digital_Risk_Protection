@@ -6,7 +6,9 @@ Loads settings from environment variables and provides typed constants.
 import os
 from pathlib import Path
 
+import streamlit as st
 from dotenv import load_dotenv
+from streamlit.errors import StreamlitSecretNotFoundError
 
 # Base directory of the repository
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,24 +16,35 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load .env file if it exists
 load_dotenv(BASE_DIR / ".env")
 
+
+def _get_config(name: str, default: str) -> str:
+    value = os.getenv(name)
+    if value is not None:
+        return value
+    try:
+        return str(st.secrets.get(name, default))
+    except StreamlitSecretNotFoundError:
+        return default
+
+
 class Settings:
     """Application settings class."""
-    
-    APP_NAME: str = os.getenv("APP_NAME", "BrandPhantom")
-    APP_ENV: str = os.getenv("APP_ENV", "development")
-    APP_SECRET_KEY: str = os.getenv("APP_SECRET_KEY", "development-only-key-not-for-production")
-    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-    
+
+    APP_NAME: str = _get_config("APP_NAME", "BrandPhantom")
+    APP_ENV: str = _get_config("APP_ENV", "development")
+    APP_SECRET_KEY: str = _get_config("APP_SECRET_KEY", "development-only-key-not-for-production")
+    LOG_LEVEL: str = _get_config("LOG_LEVEL", "INFO")
+
     # Database connection string
-    # Supports PostgreSQL (Supabase) or SQLite fallback
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./brandphantom.db")
+    # SQLite is suitable for local demos; hosted deployments should use persistent PostgreSQL.
+    DATABASE_URL: str = _get_config("DATABASE_URL", "sqlite:///./brandphantom.db")
     
     # Normalize postgres:// to postgresql:// for SQLAlchemy compatibility
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-        
-    SESSION_EXPIRY_HOURS: int = int(os.getenv("SESSION_EXPIRY_HOURS", "24"))
-    DEMO_MODE_ENABLED: bool = os.getenv("DEMO_MODE_ENABLED", "true").lower() in ("true", "1", "yes")
+    SESSION_EXPIRY_HOURS: int = int(_get_config("SESSION_EXPIRY_HOURS", "24"))
+    DEMO_MODE_ENABLED: bool = _get_config("DEMO_MODE_ENABLED", "true").lower() in ("true", "1", "yes")
+    LIVE_CONNECTORS_ENABLED: bool = _get_config("LIVE_CONNECTORS_ENABLED", "false").lower() in ("true", "1", "yes")
 
     if APP_ENV.lower() == "production":
         if (

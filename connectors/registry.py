@@ -9,6 +9,7 @@ from connectors.apps.adapters.app_store_adapter import AppleAppStoreLiveAdapter
 from connectors.apps.adapters.play_store_adapter import GooglePlayLiveAdapter
 from connectors.apps.demo import DemoAppConnector
 from connectors.base import BaseSourceConnector
+from connectors.social.adapters.bluesky_adapter import BlueskyPublicAdapter
 from connectors.social.adapters.instagram_adapter import InstagramLiveAdapter
 from connectors.social.adapters.twitter_adapter import TwitterLiveAdapter
 from connectors.social.demo import DemoSocialConnector
@@ -21,6 +22,7 @@ class ConnectorRegistry:
         self._connectors: list[BaseSourceConnector] = [
             DemoSocialConnector(),
             DemoAppConnector(),
+            BlueskyPublicAdapter(),
             TwitterLiveAdapter(),
             InstagramLiveAdapter(),
             GooglePlayLiveAdapter(),
@@ -58,7 +60,13 @@ class ConnectorRegistry:
                 "type": conn.source_type,
                 "platform": conn.platform_or_store,
                 "is_demo": conn.is_demo,
-                "status": "Operational" if is_healthy else "Unavailable",
+                "status": (
+                    "Synthetic demo"
+                    if conn.is_demo
+                    else "Enabled (not yet probed)"
+                    if is_healthy
+                    else "Disabled or unavailable"
+                ),
                 "is_healthy": is_healthy,
                 "details": message,
             })

@@ -69,8 +69,10 @@ def render(db: Session, organization_id: str):
                     st.markdown(f"**{escape(str(c['name']))}** (`{escape(str(c['type']).upper())}` / `{escape(str(c['platform']))}`)")
                     st.caption(f"Details: {c['details']}")
                 with col_c2:
-                    if c["is_healthy"]:
-                        st.markdown('<span class="bp-badge bp-badge-low">ACTIVE</span>', unsafe_allow_html=True)
+                    if c["is_demo"]:
+                        st.markdown('<span class="bp-badge bp-badge-low">SYNTHETIC DEMO</span>', unsafe_allow_html=True)
+                    elif c["is_healthy"]:
+                        st.markdown('<span class="bp-badge bp-badge-low">ENABLED · NOT PROBED</span>', unsafe_allow_html=True)
                     else:
                         st.markdown('<span class="bp-badge bp-badge-critical">UNAVAILABLE</span>', unsafe_allow_html=True)
 
@@ -78,9 +80,10 @@ def render(db: Session, organization_id: str):
         st.markdown("#### How to Enable Live Monitoring Sources")
         st.info(
             """
-            Live social and app-store collection is not implemented. Connector entries are adapter placeholders;
-            configuring credentials alone will not enable collection. The runnable scan workflow uses clearly
-            labeled synthetic demo connectors and does not contact social networks or app stores.
+            Bluesky public-profile search and Apple App Store lookup use their public endpoints when
+            `LIVE_CONNECTORS_ENABLED=true` is configured in the process environment or Streamlit secrets.
+            Endpoint access is verified when a scan runs. Other social and app-store adapters remain
+            unavailable placeholders. Public API results may be incomplete or rate-limited.
             """
         )
 

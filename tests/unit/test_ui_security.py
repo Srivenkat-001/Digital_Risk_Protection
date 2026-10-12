@@ -36,16 +36,25 @@ def test_demo_candidates_follow_configured_brand():
     assert app_candidates[2]["package_id"] == "org.acme.gateway"
 
 
-def test_live_adapters_never_report_placeholder_collectors_as_operational():
+def test_unimplemented_live_adapters_are_reported_unavailable():
     brand = SimpleNamespace(name="Acme", description="Payments", logos=[])
     for adapter in (
         TwitterLiveAdapter(),
         InstagramLiveAdapter(),
         GooglePlayLiveAdapter(),
-        AppleAppStoreLiveAdapter(),
     ):
         healthy, message = adapter.health_check()
         assert not healthy
         assert "not implemented" in message
         with pytest.raises(NotImplementedError, match="not implemented"):
             adapter.collect_candidates(brand)
+
+
+def test_apple_public_adapter_is_disabled_by_default(test_brand):
+    adapter = AppleAppStoreLiveAdapter()
+    healthy, message = adapter.health_check()
+
+    assert not healthy
+    assert "Disabled by configuration" in message
+    with pytest.raises(RuntimeError, match="disabled"):
+        adapter.collect_candidates(test_brand)

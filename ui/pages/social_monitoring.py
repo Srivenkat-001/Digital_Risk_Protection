@@ -21,12 +21,12 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     can_triage = AuthService.is_authorized(st.session_state.get("role", "viewer"), "analyst")
 
     st.markdown("## 🌐 Social Media Threat Monitoring")
-    st.caption("Review observed social profiles. The included source is a synthetic demo connector; live platform collection is not implemented.")
+    st.caption("Review observed profiles. Bluesky public search is opt-in; demo connector records are explicitly marked synthetic.")
 
     # Platform & Search Filter Row
     f_col1, f_col2, f_col3 = st.columns([2, 2, 2])
     with f_col1:
-        platform_filter = st.selectbox("Platform Filter", ["All Platforms", "Twitter/X", "Instagram", "Facebook", "Telegram"])
+        platform_filter = st.selectbox("Platform Filter", ["All Platforms", "Bluesky", "Twitter/X", "Instagram", "Facebook", "Telegram"])
     with f_col2:
         view_mode = st.radio("Display View", ["Suspicious Candidates (Findings)", "Official Excluded Accounts", "All Discovered Records"], horizontal=True)
     with f_col3:
@@ -73,6 +73,8 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
                 st.caption(f"First Observed: {c.first_observed_at.strftime('%Y-%m-%d %H:%M')} | Last Observed: {c.last_observed_at.strftime('%Y-%m-%d %H:%M')}")
                 if c.is_synthetic:
                     st.caption("🧪 *Synthetic Demo Record*")
+                elif c.platform == "Bluesky":
+                    st.caption("Live public profile metadata from the Bluesky AppView API.")
 
             with badge_col:
                 if c.is_excluded:

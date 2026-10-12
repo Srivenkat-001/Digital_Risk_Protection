@@ -21,7 +21,7 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
     can_triage = AuthService.is_authorized(st.session_state.get("role", "viewer"), "analyst")
 
     st.markdown("## 📱 Mobile App Store Threat Monitoring")
-    st.caption("Review observed store listings. The included source is synthetic demo data; live store collection is not implemented.")
+    st.caption("Review observed listings. Apple App Store public search is opt-in; demo connector records are explicitly marked synthetic.")
 
     # Filters Row
     f_col1, f_col2, f_col3 = st.columns([2, 2, 2])
@@ -77,6 +77,8 @@ def render(db: Session, organization_id: str, brand_id: str | None = None):
                 st.code(c.store_url, language=None)
                 if c.is_synthetic:
                     st.caption("🧪 *Synthetic Demo Record*")
+                elif c.store == "Apple App Store":
+                    st.caption("Live public listing metadata from Apple's iTunes Search API.")
 
             with badge_col:
                 if c.is_excluded:
