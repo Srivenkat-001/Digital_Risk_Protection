@@ -45,6 +45,7 @@ class Settings:
     SESSION_EXPIRY_HOURS: int = int(_get_config("SESSION_EXPIRY_HOURS", "24"))
     DEMO_MODE_ENABLED: bool = _get_config("DEMO_MODE_ENABLED", "true").lower() in ("true", "1", "yes")
     LIVE_CONNECTORS_ENABLED: bool = _get_config("LIVE_CONNECTORS_ENABLED", "false").lower() in ("true", "1", "yes")
+    APP_STORE_COUNTRY: str = _get_config("APP_STORE_COUNTRY", "us").lower()
 
     if APP_ENV.lower() == "production":
         if (

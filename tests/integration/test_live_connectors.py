@@ -1,6 +1,7 @@
 """Tests for public Bluesky and Apple App Store connector normalization."""
 
 import json
+from types import SimpleNamespace
 
 import pytest
 from sqlalchemy import select
@@ -87,6 +88,8 @@ def test_apple_search_maps_store_metadata_and_deduplicates(
                         "description": "A payment app",
                         "version": "2.1",
                         "averageUserRating": 4.5,
+                        "userRatingCount": 27,
+                        "primaryGenreName": "Finance",
                     }
                 ]
             }
@@ -100,7 +103,63 @@ def test_apple_search_maps_store_metadata_and_deduplicates(
     assert results[0]["package_id"] == "io.example.novapay"
     assert results[0]["publisher_name"] == "Example Publisher"
     assert results[0]["raw_metadata"]["apple_track_id"] == 123
+    assert results[0]["raw_metadata"]["category"] == "Finance"
+    assert results[0]["raw_metadata"]["rating_count"] == 27
+    assert results[0]["raw_metadata"]["storefront"] == "us"
     assert results[0]["is_synthetic"] is False
+
+
+def test_apple_search_rejects_untrusted_urls_and_malformed_metadata(
+    test_brand, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "LIVE_CONNECTORS_ENABLED", True)
+
+    def fake_get(url, params, **kwargs):
+        return _response(
+            {
+                "results": [
+                    {
+                        "bundleId": "com.example.phishing",
+                        "trackViewUrl": "https://attacker.example/app",
+                        "artistName": "Untrusted URL",
+                    },
+                    {
+                        "bundleId": "com.example.safe",
+                        "trackViewUrl": "https://apps.apple.com/app/id1",
+                        "trackName": {"unexpected": "object"},
+                        "artistName": None,
+                        "averageUserRating": "not a number",
+                        "userRatingCount": -1,
+                        "primaryGenreName": "F" * 200,
+                        "contentAdvisoryRating": ["unexpected"],
+                        "fileSizeBytes": -5,
+                    },
+                ]
+            }
+        )
+
+    monkeypatch.setattr("connectors.http_json.requests.get", fake_get)
+    results = AppleAppStoreLiveAdapter().collect_candidates(test_brand)
+
+    assert len(results) == 1
+    assert results[0]["package_id"] == "com.example.safe"
+    assert results[0]["app_name"] == "com.example.safe"
+    assert results[0]["publisher_name"] == "Unknown publisher"
+    assert results[0]["rating"] is None
+    assert results[0]["raw_metadata"]["rating_count"] is None
+    assert len(results[0]["raw_metadata"]["category"]) == 100
+    assert results[0]["raw_metadata"]["content_rating"] is None
+    assert results[0]["raw_metadata"]["file_size_bytes"] is None
+
+
+def test_apple_storefront_code_must_be_two_letters(
+    test_brand, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "LIVE_CONNECTORS_ENABLED", True)
+    monkeypatch.setattr(settings, "APP_STORE_COUNTRY", "usa")
+
+    with pytest.raises(ValueError, match="two-letter"):
+        AppleAppStoreLiveAdapter().collect_candidates(test_brand)
 
 
 @pytest.mark.parametrize("connector", [BlueskyPublicAdapter(), AppleAppStoreLiveAdapter()])
@@ -185,6 +244,78 @@ def test_public_connector_results_persist_through_scan(
     assert "Apple iTunes Search API" in app_candidate.raw_metadata
 
 
+def test_live_app_observation_replaces_demo_source_label(
+    db_session, test_org, test_brand
+) -> None:
+    from db.repositories.candidate_repo import CandidateRepository
+
+    repo = CandidateRepository(db_session)
+    demo_candidate, created = repo.upsert_app_candidate(
+        organization_id=test_org.id,
+        brand_id=test_brand.id,
+        store="Apple App Store",
+        app_name="Sample Wallet",
+        package_id="com.example.wallet",
+        publisher_name="Sample Publisher",
+        store_url="https://apps.apple.com/us/app/id123",
+        raw_metadata={"source": "synthetic demo"},
+        is_synthetic=True,
+    )
+    assert created and demo_candidate.is_synthetic
+
+    updated, created_again = repo.upsert_app_candidate(
+        organization_id=test_org.id,
+        brand_id=test_brand.id,
+        store="Apple App Store",
+        app_name="Sample Wallet",
+        package_id="com.example.wallet",
+        publisher_name="Sample Publisher",
+        store_url="https://apps.apple.com/us/app/id123",
+        raw_metadata={"source": "Apple iTunes Search API"},
+        is_synthetic=False,
+    )
+
+    assert not created_again
+    assert updated.id == demo_candidate.id
+    assert not updated.is_synthetic
+    assert "Apple iTunes Search API" in updated.raw_metadata
+
+
+def test_live_social_observation_replaces_demo_source_label(
+    db_session, test_org, test_brand
+) -> None:
+    from db.repositories.candidate_repo import CandidateRepository
+
+    repo = CandidateRepository(db_session)
+    demo_candidate, created = repo.upsert_social_candidate(
+        organization_id=test_org.id,
+        brand_id=test_brand.id,
+        platform="Bluesky",
+        profile_url="https://bsky.app/profile/acme.example",
+        username="acme.example",
+        display_name="Acme",
+        raw_metadata={"source": "synthetic demo"},
+        is_synthetic=True,
+    )
+    assert created and demo_candidate.is_synthetic
+
+    updated, created_again = repo.upsert_social_candidate(
+        organization_id=test_org.id,
+        brand_id=test_brand.id,
+        platform="Bluesky",
+        profile_url="https://bsky.app/profile/acme.example",
+        username="acme.example",
+        display_name="Acme",
+        raw_metadata={"source": "Bluesky public AppView API"},
+        is_synthetic=False,
+    )
+
+    assert not created_again
+    assert updated.id == demo_candidate.id
+    assert not updated.is_synthetic
+    assert "Bluesky public AppView API" in updated.raw_metadata
+
+
 @pytest.mark.live
 def test_bluesky_public_endpoint_returns_profile_results_when_reachable() -> None:
     from connectors.http_json import get_json
@@ -198,12 +329,14 @@ def test_bluesky_public_endpoint_returns_profile_results_when_reachable() -> Non
 
 
 @pytest.mark.live
-def test_apple_public_endpoint_returns_app_results_when_reachable() -> None:
-    from connectors.http_json import get_json
+def test_apple_public_connector_returns_normalized_live_app_when_reachable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(settings, "LIVE_CONNECTORS_ENABLED", True)
+    brand = SimpleNamespace(name="github", aliases=[], logos=[])
+    candidates = AppleAppStoreLiveAdapter().collect_candidates(brand)
 
-    payload = get_json(
-        "https://itunes.apple.com/search",
-        {"term": "github", "entity": "software", "country": "us", "limit": 1},
-    )
-    assert isinstance(payload.get("results"), list)
-    assert payload["results"], "Expected the public search endpoint to return an app for 'github'."
+    assert candidates, "Expected the public Apple search endpoint to return an app for 'github'."
+    assert all(candidate["is_synthetic"] is False for candidate in candidates)
+    assert all(candidate["raw_metadata"]["source"] == "Apple iTunes Search API" for candidate in candidates)
+    assert all(candidate["store_url"].startswith("https://apps.apple.com/") for candidate in candidates)

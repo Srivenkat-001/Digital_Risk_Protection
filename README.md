@@ -74,6 +74,15 @@ For a live presentation, use only the demo database and do not imply that any di
 
 The automated tests use mocks/synthetic records by default and do not require third-party APIs. `pytest -m live` opts in to small, bounded read-only requests to the public Bluesky and Apple endpoints; these checks are excluded from the default `pytest -q` run.
 
+For Streamlit Community Cloud, configure:
+
+```toml
+LIVE_CONNECTORS_ENABLED = "true"
+APP_STORE_COUNTRY = "us"
+```
+
+The Apple connector collects public metadata only for the configured storefront, querying a brand name and up to two aliases. The iTunes Search API is a public search endpoint, not a complete app-catalog feed; results can be incomplete. Google Play does not provide a public third-party catalog search endpoint through its official Developer API, so BrandPhantom leaves Google Play discovery unavailable instead of scraping or misrepresenting publisher-only APIs.
+
 ## Prerequisites
 
 - Windows 10/11 with Python 3.10 or newer. Python 3.14 is supported by the current dependency set; the setup commands below use the Python launcher (`py`).

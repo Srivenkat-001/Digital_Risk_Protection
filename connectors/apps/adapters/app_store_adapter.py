@@ -1,5 +1,6 @@
 """Apple App Store search using Apple's public iTunes Search API."""
 
+import re
 from typing import Any
 from urllib.parse import urlparse
 
@@ -11,6 +12,7 @@ from db.models.brand import Brand
 API_URL = "https://itunes.apple.com/search"
 MAX_QUERIES = 3
 MAX_RESULTS = 75
+COUNTRY_CODE = re.compile(r"^[a-z]{2}$")
 
 
 class AppleAppStoreLiveAdapter(BaseAppConnector):
@@ -36,13 +38,16 @@ class AppleAppStoreLiveAdapter(BaseAppConnector):
     def collect_candidates(self, brand: Brand) -> list[dict[str, Any]]:
         if not settings.LIVE_CONNECTORS_ENABLED:
             raise RuntimeError("Apple App Store collection is disabled. Enable LIVE_CONNECTORS_ENABLED to proceed.")
+        country = settings.APP_STORE_COUNTRY.lower()
+        if not COUNTRY_CODE.fullmatch(country):
+            raise ValueError("APP_STORE_COUNTRY must be a two-letter App Store storefront country code.")
 
         queries = list(dict.fromkeys([brand.name, *(alias.alias for alias in brand.aliases)]))[:MAX_QUERIES]
         candidates: dict[str, dict[str, Any]] = {}
         for query in queries:
             payload = get_json(
                 API_URL,
-                {"term": query, "entity": "software", "country": "us", "limit": 50},
+                {"term": query, "entity": "software", "country": country, "limit": 50},
             )
             listings = payload.get("results", [])
             if not isinstance(listings, list):
@@ -67,6 +72,13 @@ class AppleAppStoreLiveAdapter(BaseAppConnector):
                 icon_url = listing.get("artworkUrl512") or listing.get("artworkUrl100")
                 version = listing.get("version")
                 rating = listing.get("averageUserRating")
+                rating_count = listing.get("userRatingCount")
+                category = listing.get("primaryGenreName")
+                track_id = listing.get("trackId")
+                seller_id = listing.get("artistId")
+                content_rating = listing.get("contentAdvisoryRating")
+                minimum_os_version = listing.get("minimumOsVersion")
+                file_size_bytes = listing.get("fileSizeBytes")
                 candidates[bundle_id.lower()] = {
                     "store": "Apple App Store",
                     "app_name": app_name[:255] if isinstance(app_name, str) else bundle_id,
@@ -79,7 +91,14 @@ class AppleAppStoreLiveAdapter(BaseAppConnector):
                     "rating": rating if isinstance(rating, (int, float)) and 0 <= rating <= 5 else None,
                     "raw_metadata": {
                         "source": "Apple iTunes Search API",
-                        "apple_track_id": listing.get("trackId"),
+                        "apple_track_id": track_id if isinstance(track_id, (int, str)) else None,
+                        "seller_id": seller_id if isinstance(seller_id, (int, str)) else None,
+                        "category": category[:100] if isinstance(category, str) else None,
+                        "rating_count": rating_count if isinstance(rating_count, int) and rating_count >= 0 else None,
+                        "content_rating": content_rating[:30] if isinstance(content_rating, str) else None,
+                        "minimum_os_version": minimum_os_version[:30] if isinstance(minimum_os_version, str) else None,
+                        "file_size_bytes": file_size_bytes if isinstance(file_size_bytes, int) and file_size_bytes >= 0 else None,
+                        "storefront": country,
                         "collected_at": collected_at(),
                     },
                     "is_synthetic": False,

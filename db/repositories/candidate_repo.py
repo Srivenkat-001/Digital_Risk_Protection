@@ -58,6 +58,7 @@ class CandidateRepository:
         if existing:
             # Update observation timestamp and potentially changed dynamic data
             existing.last_observed_at = now
+            existing.is_synthetic = is_synthetic
             existing.display_name = display_name
             existing.bio = bio or existing.bio
             if avatar_url:
@@ -126,6 +127,7 @@ class CandidateRepository:
 
         if existing:
             existing.last_observed_at = now
+            existing.is_synthetic = is_synthetic
             existing.app_name = app_name
             existing.publisher_name = publisher_name
             existing.description = description or existing.description
